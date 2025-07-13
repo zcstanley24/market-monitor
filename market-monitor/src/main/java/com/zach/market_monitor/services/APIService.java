@@ -1,4 +1,4 @@
-package com.zach.market_monitor;
+package com.zach.market_monitor.services;
 
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.stereotype.Service;

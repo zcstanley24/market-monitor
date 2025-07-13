@@ -1,5 +1,6 @@
-package com.zach.market_monitor;
+package com.zach.market_monitor.controllers;
 
+import com.zach.market_monitor.services.APIService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
