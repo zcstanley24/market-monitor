@@ -2,6 +2,7 @@ package com.zach.market_monitor.services;
 
 import com.zach.market_monitor.models.UserEntity;
 import com.zach.market_monitor.repositories.UserRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Primary
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
