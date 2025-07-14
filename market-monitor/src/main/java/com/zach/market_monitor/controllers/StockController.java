@@ -27,4 +27,6 @@ public class StockController {
     public String quote(@RequestParam(defaultValue = "AAPL") String symbol, @RequestParam(defaultValue = "1day") String interval) {
         return apiService.getQuote(symbol, interval);
     }
+
+
 }

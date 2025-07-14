@@ -2,6 +2,7 @@ package com.zach.market_monitor.controllers;
 
 import com.zach.market_monitor.security.JwtAuthenticationResponse;
 import com.zach.market_monitor.security.JwtTokenProvider;
+import com.zach.market_monitor.security.SignupRequestVerification;
 import com.zach.market_monitor.security.UserCredentials;
 import com.zach.market_monitor.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
     private final UserService userService;
+    private final SignupRequestVerification signupRequestVerification;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserService userService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider,
+                          UserService userService, SignupRequestVerification signupRequestVerification) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.userService = userService;
+        this.signupRequestVerification = signupRequestVerification;
     }
 
     @PostMapping("/login")
@@ -47,10 +51,16 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserCredentials registrationRequest) {
         try {
-            //Check for username uniqueness, password constraints, store in DB
-            return ResponseEntity.status(HttpStatus.OK).body("Success");
+            String signupCheckResult = signupRequestVerification.verifySignup(registrationRequest);
+            if(signupCheckResult == "Valid") {
+                userService.createUser(registrationRequest.getUsername(), registrationRequest.getPassword());
+                return ResponseEntity.status(HttpStatus.OK).body("Success");
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(signupCheckResult);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username must be unique");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unknown error occurred while registering new user");
         }
     }
 

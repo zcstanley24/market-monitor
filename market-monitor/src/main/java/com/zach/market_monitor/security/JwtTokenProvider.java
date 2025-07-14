@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 
+import java.security.Key;
 import java.util.Date;
 
 @Component
@@ -18,12 +21,13 @@ public class JwtTokenProvider {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
         Date now = new Date();
         Date expirationTime = new Date(now.getTime() + JWT_EXPIRATION_MS);
+        Key key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expirationTime)
-                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
