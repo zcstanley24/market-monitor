@@ -31,6 +31,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+        if (path.startsWith("/auth/login") || path.startsWith("/auth/register")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = null;
         String username = null;
         Cookie[] cookies = request.getCookies();
