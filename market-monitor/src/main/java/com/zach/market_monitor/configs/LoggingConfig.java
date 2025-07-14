@@ -1,4 +1,4 @@
-package com.zach.market_monitor.utils;
+package com.zach.market_monitor.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

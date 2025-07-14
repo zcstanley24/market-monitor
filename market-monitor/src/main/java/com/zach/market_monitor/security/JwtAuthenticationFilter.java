@@ -3,6 +3,7 @@ package com.zach.market_monitor.security;
 import com.zach.market_monitor.services.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,17 +31,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
         String token = null;
         String username = null;
-
-        if (header != null && header.startsWith("Bearer ")) {
-            token = header.substring(7);
-            try {
-                username = jwtTokenProvider.getUsernameFromToken(token);
-            } catch (Exception e) {
-                logger.error("JWT token extraction failed", e);
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("token".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
             }
+        }
+        try {
+            username = jwtTokenProvider.getUsernameFromToken(token);
+        } catch (Exception e) {
+            logger.error("JWT token extraction failed", e);
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

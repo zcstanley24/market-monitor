@@ -5,8 +5,11 @@ import com.zach.market_monitor.security.JwtTokenProvider;
 import com.zach.market_monitor.security.SignupRequestVerification;
 import com.zach.market_monitor.security.UserCredentials;
 import com.zach.market_monitor.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserCredentials loginRequest) {
+    public ResponseEntity<?> login(@RequestBody UserCredentials loginRequest, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -42,7 +45,18 @@ public class AuthController {
             );
 
             String jwt = tokenProvider.generateToken(authentication);
-            return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+
+            ResponseCookie cookie = ResponseCookie.from("token", jwt)
+                    .httpOnly(true)
+                    .secure(false) // Set to true in prod with HTTPS
+                    .path("/")
+                    .maxAge(24 * 60 * 60) // 1 day
+                    .sameSite("Lax") // alt option Lax
+                    .build();
+
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+            return ResponseEntity.ok("Login successful");
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
@@ -62,10 +76,5 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unknown error occurred while registering new user");
         }
-    }
-
-    @GetMapping("/test-username")
-    public long testusername(@RequestParam(defaultValue = "AAPL") String symbol) {
-        return userService.countUsers();
     }
 }

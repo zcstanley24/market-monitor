@@ -1,6 +1,7 @@
 package com.zach.market_monitor.controllers;
 
 import com.zach.market_monitor.services.APIService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,7 @@ public class StockController {
         return apiService.getCurrentPrice(symbol);
     }
 
+    @Cacheable(cacheNames = "quotes")
     @GetMapping("/quote")
     public String quote(@RequestParam(defaultValue = "AAPL") String symbol, @RequestParam(defaultValue = "1day") String interval) {
         return apiService.getQuote(symbol, interval);
