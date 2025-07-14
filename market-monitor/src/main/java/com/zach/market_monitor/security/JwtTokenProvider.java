@@ -33,16 +33,19 @@ public class JwtTokenProvider {
 
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(JWT_SECRET)
+                .setSigningKey(JWT_SECRET.getBytes())
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, UserDetails userDetails) {
         try {
-            Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token);
-            return true;
+            Claims claims = Jwts.parser().setSigningKey(JWT_SECRET.getBytes()).parseClaimsJws(token).getBody();
+            String username = claims.getSubject();
+            Date expiration = claims.getExpiration();
+
+            return (username.equals(userDetails.getUsername()) && !expiration.before(new Date()));
         } catch (SignatureException ex) {
             System.out.println("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
