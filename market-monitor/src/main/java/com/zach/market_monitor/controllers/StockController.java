@@ -30,5 +30,9 @@ public class StockController {
         return apiService.getQuote(symbol, interval);
     }
 
-
+    @Cacheable(cacheNames = "stocks")
+    @GetMapping("/stock-data")
+    public String stockData(@RequestParam(defaultValue = "AAPL") String symbol, @RequestParam(defaultValue = "1day") String interval) {
+        return apiService.getQuote(symbol, interval);
+    }
 }

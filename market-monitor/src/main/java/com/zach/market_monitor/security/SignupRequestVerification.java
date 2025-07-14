@@ -15,13 +15,24 @@ public class SignupRequestVerification {
     }
 
     public String verifySignup(UserCredentials signupRequest) {
-        Optional<UserEntity> userOpt = userService.getUserByUsername(signupRequest.getUsername());
+        String username = signupRequest.getUsername();
+        String password = signupRequest.getPassword();
+
+        Optional<UserEntity> userOpt = userService.getUserByUsername(username);
         if(userOpt.isPresent()) {
             return "Username already exists";
         }
-        String password = signupRequest.getPassword();
-        if(password == null || password.length() < 8) {
-            return "Password must be at least 8 characters";
+        if(username == null || username.length() < 8) {
+            return "Username length must be at least 8 characters";
+        }
+        else if(username.length() > 30) {
+            return "Username length cannot exceed 30 characters";
+        }
+        else if(password == null || password.length() < 8) {
+            return "Password length must be at least 8 characters";
+        }
+        else if(password.length() > 30) {
+            return "Password length cannot exceed 30 characters";
         }
         boolean hasUpperChar = false;
         boolean hasLowerChar = false;

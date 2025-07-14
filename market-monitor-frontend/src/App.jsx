@@ -1,7 +1,8 @@
 import React from 'react';
 import './App.css';
-import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   )

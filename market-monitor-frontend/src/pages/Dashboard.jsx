@@ -1,4 +1,4 @@
-
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -9,16 +9,39 @@ import {
 } from '@chakra-ui/react';
 
 const Dashboard = () => {
+  const [stockData, setStockData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  
+  useEffect(() => {
+    fetch("http://localhost:8080/stock-data", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include"
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch stock data");
+        return res.json();
+      })
+      .then((data) => {
+        setStockData(data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setIsLoading(false);
+      });
+  }, []);
+
   return (
     <Flex height="100vh" width="100vw" flexDirection="column">
-      {/* Top header/banner */}
       <Box bg="blue.600" color="white" px={6} py={4} flexShrink={0}>
         <Heading size="md">My Dashboard</Heading>
       </Box>
 
-      {/* Main area: sidebar + content */}
       <Flex flex="1" overflow="hidden">
-        {/* Sidebar */}
         <Box
           bg="gray.800"
           color="white"
@@ -39,16 +62,25 @@ const Dashboard = () => {
             </Link>
           </VStack>
         </Box>
-
-        {/* Main content */}
         <Box flex="1" bg="gray.50" p={6} overflowY="auto">
           <Heading size="lg" mb={4}>
             Dashboard Content
           </Heading>
-          <Text>
-            This area stretches to fill the remaining width and height of the screen.
-          </Text>
-          {/* Your dashboard widgets/components go here */}
+          {isLoading && (
+            <div>
+              Loading...
+            </div>
+          )}
+          {!isLoading && (
+            <Text>
+              {console.log(stockData)}
+            </Text>
+          )}
+          {error && (
+            <Text>
+              {error}
+            </Text>
+          )}
         </Box>
       </Flex>
     </Flex>);

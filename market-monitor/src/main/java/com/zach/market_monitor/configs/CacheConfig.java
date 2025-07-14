@@ -10,7 +10,7 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("quotes");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("quotes", "stocks");
         return cacheManager;
     }
 }
