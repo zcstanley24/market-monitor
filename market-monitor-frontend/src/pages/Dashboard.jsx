@@ -7,6 +7,7 @@ import {
   Link,
   Heading,
 } from '@chakra-ui/react';
+import StockTile from '../components/StockTile.jsx';
 
 const Dashboard = () => {
   const [stockData, setStockData] = useState(null);
@@ -28,6 +29,7 @@ const Dashboard = () => {
       .then((data) => {
         setStockData(data);
         setIsLoading(false);
+        console.log(data);
       })
       .catch((err) => {
         setError(err.message);
@@ -71,10 +73,8 @@ const Dashboard = () => {
               Loading...
             </div>
           )}
-          {!isLoading && (
-            <Text>
-              {console.log(stockData)}
-            </Text>
+          {!isLoading && stockData && (
+            <StockTile stockData={stockData} />
           )}
           {error && (
             <Text>
