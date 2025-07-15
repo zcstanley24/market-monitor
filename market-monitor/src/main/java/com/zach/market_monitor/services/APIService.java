@@ -1,5 +1,6 @@
 package com.zach.market_monitor.services;
 
+import com.zach.market_monitor.utils.StockPriceResponse;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,15 +24,29 @@ public class APIService {
                 .build();
     }
 
-    public String getCurrentPrice(String stockSymbol) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/price")
-                        .queryParam("symbol", stockSymbol)
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+    public StockPriceResponse getCurrentPrice(String stockSymbol) {
+        try {
+            return webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/price")
+                            .queryParam("symbol", stockSymbol)
+                            .build())
+                    .retrieve()
+                    .onStatus(
+                            status -> status.is4xxClientError() || status.is5xxServerError(),
+                            clientResponse -> clientResponse
+                                    .createException()
+                                    .flatMap(Mono::error)
+                    )
+                    .bodyToMono(StockPriceResponse.class) // FIXED
+                    .block();
+        } catch (WebClientResponseException e) {
+            System.err.println("HTTP Status: " + e.getRawStatusCode() + ", Body: " + e.getResponseBodyAsString());
+            throw e;
+        } catch (Exception e) {
+            System.err.println("Request failed: " + e.getMessage());
+            throw new RuntimeException("Failed to get quote for " + stockSymbol, e);
+        }
     }
 
     public String getQuote(String stockSymbol, String interval) {

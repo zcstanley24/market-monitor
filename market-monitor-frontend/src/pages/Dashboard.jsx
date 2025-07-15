@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
+  Card,
+  CardContent,
   Modal,
   Typography,
   Button,
@@ -21,12 +23,16 @@ import {
   Link,
   Heading,
 } from '@chakra-ui/react';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
 import StockTile from '../components/StockTile.jsx';
 import '../styles/App.css';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
   const [stockData, setStockData] = useState([]);
+  const [cronStockData, setCronStockData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFollowedModalLoading, setIsFollowedModalLoading] = useState(false);
   const [error, setError] = useState("");
@@ -88,6 +94,48 @@ const Dashboard = () => {
         setIsLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/cron-stock-data", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include"
+    })
+      .then((res) => {
+        if(res.status === 403) {
+          window.location.href = '/login';
+        }
+        else if(!res.ok) {
+          throw new Error("Failed to fetch stock data");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        const grouped = {};
+
+        data.forEach(({ symbol, retrievedPrice, retrievalTime }) => {
+          const date = retrievalTime.slice(0, 10); 
+          if (!grouped[date]) {
+            grouped[date] = { retrievalTime: date };
+          }
+
+          grouped[date][symbol] = retrievedPrice;
+        });
+
+        const chartData = Object.values(grouped).sort(
+          (a, b) => new Date(a.retrievalTime) - new Date(b.retrievalTime)
+        );
+        setCronStockData(chartData);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setIsLoading(false);
+      });
+  }, []);
+
 
   const handleFollowedDropdownChange = (e) => {
     const newValues = e.target.value;
@@ -231,6 +279,26 @@ const Dashboard = () => {
             <Heading size="lg" mb={4} color="black">
               Stocks of Interest
             </Heading>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Stock Price (Last 5 Days)
+                </Typography>
+                <Box height={300} width={700}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={cronStockData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="retrievalTime" />
+                      <YAxis domain={['auto', 'auto']} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="T" stroke="#1976d2" strokeWidth={2} />
+                      <Line type="monotone" dataKey="VZ" stroke="#2e7d32" strokeWidth={2} />
+                      <Line type="monotone" dataKey="TMUS" stroke="#f57c00" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Box>
+              </CardContent>
+            </Card>
           </VStack>
         </Box>
       </Flex>

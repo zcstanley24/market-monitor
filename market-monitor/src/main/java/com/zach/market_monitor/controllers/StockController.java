@@ -1,9 +1,11 @@
 package com.zach.market_monitor.controllers;
 
+import com.zach.market_monitor.models.StockValueEntity;
 import com.zach.market_monitor.models.UserEntity;
 import com.zach.market_monitor.repositories.UserRepository;
 import com.zach.market_monitor.security.JwtTokenProvider;
 import com.zach.market_monitor.services.APIService;
+import com.zach.market_monitor.services.StockValueService;
 import com.zach.market_monitor.services.UserService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,22 +23,14 @@ public class StockController {
     private final APIService apiService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final StockValueService stockValueService;
 
-    public StockController(APIService apiService, JwtTokenProvider jwtTokenProvider, UserService userService) {
+    public StockController(APIService apiService, JwtTokenProvider jwtTokenProvider, UserService userService, StockValueService stockValueService) {
 
         this.apiService = apiService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
-    }
-
-    @GetMapping("/test")
-    public String test() {
-        return "Hello, world!";
-    }
-
-    @GetMapping("/price2")
-    public String price2(@RequestParam(defaultValue = "AAPL") String symbol) {
-        return apiService.getCurrentPrice(symbol);
+        this.stockValueService = stockValueService;
     }
 
     @Cacheable(cacheNames = "quotes")
@@ -101,5 +96,16 @@ public class StockController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unknown error occurred while updating followed stocks");
         }
+    }
+
+    @GetMapping("/cron-stock-data")
+    public ResponseEntity<?> cronStockData() {
+        List<StockValueEntity> cronInfo = null;
+        try {
+            cronInfo = stockValueService.getAllSavedStockValues();
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching stock information");
+        }
+        return ResponseEntity.ok(cronInfo);
     }
 }
