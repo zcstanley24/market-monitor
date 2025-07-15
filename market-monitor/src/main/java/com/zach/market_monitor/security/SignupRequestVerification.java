@@ -1,12 +1,13 @@
 package com.zach.market_monitor.security;
 
 import com.zach.market_monitor.models.UserEntity;
-import com.zach.market_monitor.services.CustomUserDetailsService;
 import com.zach.market_monitor.services.UserService;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class SignupRequestVerification {
@@ -16,13 +17,12 @@ public class SignupRequestVerification {
         this.userService = userService;
     }
 
-    public String verifySignup(UserCredentials signupRequest) {
+    public String verifySignup(UserSignupRequest signupRequest) {
         String username = signupRequest.getUsername();
         String password = signupRequest.getPassword();
-        Set<String> followedStocks = signupRequest.getFollowedStocks();
-        Set<String> allowedStocks = Set.of("AAPL", "AMZN");
+        String followedStocks = signupRequest.getFollowedStocks();
 
-        if(!allowedStocks.containsAll(followedStocks)) {
+        if(!userService.verifyFollowedStocks(followedStocks)) {
             return "One or more stock selections is invalid";
         }
 

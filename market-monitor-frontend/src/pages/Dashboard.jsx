@@ -33,7 +33,28 @@ const Dashboard = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSymbols, setSelectedSymbols] = useState([]);
   const [followedModalError, setFollowedModalError] = useState("");
-  const options = ["AAPL", "TSLA", "AMZN", "GOOGL", "MSFT"];
+  const options = [
+    { name: "NVIDIA", symbol: "NVDA"},
+    { name: "Microsoft", symbol: "MSFT"},
+    { name: "Google", symbol: "GOOG"},
+    { name: "Apple", symbol: "AAPL"},
+    { name: "Amazon", symbol: "AMZN"},
+    { name: "Meta", symbol: "META"},
+    { name: "Broadcom", symbol: "AVGO"},
+    { name: "Target", symbol: "TGT"},
+    { name: "Tesla", symbol: "TSLA"},
+    { name: "JPMorgan Chase", symbol: "JPM"},
+    { name: "Walmart", symbol: "WMT"},
+    { name: "Eli Lilly", symbol: "LLY"},
+    { name: "Visa", symbol: "V"},
+    { name: "Oracle", symbol: "ORCL"},
+    { name: "Netflix", symbol: "NFLX"},
+    { name: "Mastercard", symbol: "MA"},
+    { name: "Exxon Mobil", symbol: "XOM"},
+    { name: "Costco", symbol: "COST"},
+    { name: "Johnson & Johnson", symbol: "JNJ"},
+    { name: "Home Depot", symbol: "HD"}
+  ];
   
   useEffect(() => {
     fetch("http://localhost:8080/stock-data", {
@@ -53,9 +74,14 @@ const Dashboard = () => {
         return res.json();
       })
       .then((data) => {
+        if(data?.code == 429) {
+          setError("Maximum API calls exceeded. Please try again in a minute.");
+        }
+        else if(data?.code?.toString().startsWith("4") || data?.code?.toString().startsWith("5")) {
+          setError("Failed to fetch stock data");
+        }
         setStockData(Object.values(data));
         setIsLoading(false);
-        console.log(Object.values(data));
       })
       .catch((err) => {
         setError(err.message);
@@ -84,9 +110,7 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "application/json"
       },
-      body: {
-        symbols: selectedSymbols
-      },
+      body: selectedSymbols.join(","),
       credentials: "include"
     })
       .then((res) => {
@@ -96,7 +120,7 @@ const Dashboard = () => {
         else if(!res.ok) {
           throw new Error("Failed to update followed stocks");
         }
-        return res.json();
+        return;
       })
       .then(() => {
         window.location.reload();
@@ -171,9 +195,9 @@ const Dashboard = () => {
                       label="Choose up to 3 options"
                     >
                       {options.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          <Checkbox checked={selectedSymbols.indexOf(option) > -1} />
-                          <ListItemText primary={option} />
+                        <MenuItem key={option.name} value={option.symbol}>
+                          <Checkbox checked={selectedSymbols.includes(option.symbol)} />
+                          <ListItemText primary={option.name} />
                         </MenuItem>
                       ))}
                     </Select>
@@ -200,7 +224,7 @@ const Dashboard = () => {
               ))}
             </HStack>
             {error && (
-              <Text>
+              <Text color="red">
                 {error}
               </Text>
             )}

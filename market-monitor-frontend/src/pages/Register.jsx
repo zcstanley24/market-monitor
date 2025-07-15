@@ -1,17 +1,54 @@
 import React, { useState } from "react";
 import { Box, Input, Button, Text, Heading, VStack } from "@chakra-ui/react";
 import Tooltip from '../components/Tooltip.jsx';
+import {
+  Modal,
+  Typography,
+  Box as MuiBox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Checkbox,
+  ListItemText,
+  CircularProgress,
+} from '@mui/material';
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  // const [isUsernameFocused, setIsUsernameFocused] = useState(false);
-  // const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [selectedSymbols, setSelectedSymbols] = useState([]);
+  const options = [
+    { name: "NVIDIA", symbol: "NVDA"},
+    { name: "Microsoft", symbol: "MSFT"},
+    { name: "Google", symbol: "GOOG"},
+    { name: "Apple", symbol: "AAPL"},
+    { name: "Amazon", symbol: "AMZN"},
+    { name: "Meta", symbol: "META"},
+    { name: "Broadcom", symbol: "AVGO"},
+    { name: "Target", symbol: "TGT"},
+    { name: "Tesla", symbol: "TSLA"},
+    { name: "JPMorgan Chase", symbol: "JPM"},
+    { name: "Walmart", symbol: "WMT"},
+    { name: "Eli Lilly", symbol: "LLY"},
+    { name: "Visa", symbol: "V"},
+    { name: "Oracle", symbol: "ORCL"},
+    { name: "Netflix", symbol: "NFLX"},
+    { name: "Mastercard", symbol: "MA"},
+    { name: "Exxon Mobil", symbol: "XOM"},
+    { name: "Costco", symbol: "COST"},
+    { name: "Johnson & Johnson", symbol: "JNJ"},
+    { name: "Home Depot", symbol: "HD"}
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if(!selectedSymbols.length) {
+      setError("Please choose at least one stock");
+      return;
+    }
 
     if (!username || !password) {
       setError("Please enter username and password");
@@ -27,13 +64,15 @@ const Register = () => {
       return;
     }
 
+    const followedStocks = selectedSymbols.join(",");
+
     try {
       const response = await fetch("http://localhost:8080/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, followedStocks }),
         credentials: "include"
       });
 
@@ -73,6 +112,18 @@ const Register = () => {
     }
   };
 
+  const handleFollowedDropdownChange = (e) => {
+    const newValues = e.target.value;
+
+    if(newValues.length <= 3) {
+      setError("");
+    }
+    else {
+      setError("Please select less than or equal to 3 stocks");
+    }
+    setSelectedSymbols(newValues);
+  }
+
   return (
     <Box
       maxW="400px"
@@ -94,8 +145,6 @@ const Register = () => {
               placeholder="Username"
               value={username}
               onChange={(e) => handleUsernameChange(e.target.value)}
-              // onFocus={() => setIsUsernameFocused(true)}
-              // onBlur={() => setIsUsernameFocused(false)}
             />
           </Tooltip>
           <Tooltip label="Please ensure your password contains at least one lowercase, uppercase, numerical, and special character.">
@@ -104,8 +153,6 @@ const Register = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => handlePasswordChange(e.target.value)}
-              // onFocus={() => setIsPasswordFocused(true)}
-              // onBlur={() => setIsPasswordFocused(false)}
             />
           </Tooltip>
           {error && (
@@ -113,6 +160,25 @@ const Register = () => {
               {error}
             </Text>
           )}
+          <FormControl fullWidth>
+            <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
+            <Select
+              labelId="array-dropdown-label"
+              id="array-dropdown"
+              multiple
+              value={selectedSymbols}
+              onChange={handleFollowedDropdownChange}
+              renderValue={(selected) => selected.join(", ")}
+              label="Choose up to 3 options"
+            >
+              {options.map((option) => (
+                <MenuItem key={option.name} value={option.symbol}>
+                  <Checkbox checked={selectedSymbols.includes(option.symbol)} />
+                  <ListItemText primary={option.name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <Button type="submit" colorScheme="blue" width="full">
             Register
           </Button>

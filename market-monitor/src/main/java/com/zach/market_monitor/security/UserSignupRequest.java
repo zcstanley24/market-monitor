@@ -2,11 +2,11 @@ package com.zach.market_monitor.security;
 
 import java.util.Set;
 
-public class UserCredentials {
+public class UserSignupRequest {
     private String username;
     private String password;
 
-    private Set<String> followedStocks;
+    private String followedStocks;
 
     public String getUsername() {
         return username;
@@ -22,5 +22,13 @@ public class UserCredentials {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFollowedStocks() {
+        return followedStocks;
+    }
+
+    public void setFollowedStocks(String followedStocks) {
+        this.followedStocks = followedStocks;
     }
 }

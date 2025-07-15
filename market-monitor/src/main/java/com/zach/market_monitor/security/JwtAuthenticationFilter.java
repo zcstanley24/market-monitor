@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("token".equals(cookie.getName())) {
+                if ("marketMonitorToken".equals(cookie.getName())) {
                     token = cookie.getValue();
                     break;
                 }

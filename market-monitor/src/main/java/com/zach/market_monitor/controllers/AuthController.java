@@ -1,9 +1,6 @@
 package com.zach.market_monitor.controllers;
 
-import com.zach.market_monitor.security.JwtAuthenticationResponse;
-import com.zach.market_monitor.security.JwtTokenProvider;
-import com.zach.market_monitor.security.SignupRequestVerification;
-import com.zach.market_monitor.security.UserCredentials;
+import com.zach.market_monitor.security.*;
 import com.zach.market_monitor.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +43,7 @@ public class AuthController {
 
             String jwt = tokenProvider.generateToken(authentication);
 
-            ResponseCookie cookie = ResponseCookie.from("token", jwt)
+            ResponseCookie cookie = ResponseCookie.from("marketMonitorToken", jwt)
                     .httpOnly(true)
                     .secure(false) // Set to true in prod with HTTPS
                     .path("/")
@@ -63,11 +60,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserCredentials registrationRequest) {
+    public ResponseEntity<?> register(@RequestBody UserSignupRequest registrationRequest) {
+        System.out.println(registrationRequest.getUsername());
         try {
             String signupCheckResult = signupRequestVerification.verifySignup(registrationRequest);
             if(signupCheckResult == "Valid") {
-                userService.createUser(registrationRequest.getUsername(), registrationRequest.getPassword(), registrationRequest.get);
+                userService.createUser(registrationRequest.getUsername(), registrationRequest.getPassword(), registrationRequest.getFollowedStocks());
                 return ResponseEntity.status(HttpStatus.OK).body("Success");
             }
             else {
