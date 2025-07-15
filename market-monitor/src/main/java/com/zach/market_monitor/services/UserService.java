@@ -26,11 +26,12 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public UserEntity createUser(String username, String password) {
+    public UserEntity createUser(String username, String password, Set<String> followedStocks) {
         String encodedPassword = securityConfig.passwordEncoder().encode(password);
         UserEntity userCandidate = new UserEntity();
         userCandidate.setUsername(username);
         userCandidate.setPassword(encodedPassword);
+        userCandidate.setFollowedStocks(followedStocks);
         userCandidate.setRoles(Set.of("USER"));
         return userRepository.save(userCandidate);
     }

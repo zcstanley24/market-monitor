@@ -6,6 +6,8 @@ import com.zach.market_monitor.services.UserService;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.Set;
+
 @Component
 public class SignupRequestVerification {
     private final UserService userService;
@@ -17,6 +19,12 @@ public class SignupRequestVerification {
     public String verifySignup(UserCredentials signupRequest) {
         String username = signupRequest.getUsername();
         String password = signupRequest.getPassword();
+        Set<String> followedStocks = signupRequest.getFollowedStocks();
+        Set<String> allowedStocks = Set.of("AAPL", "AMZN");
+
+        if(!allowedStocks.containsAll(followedStocks)) {
+            return "One or more stock selections is invalid";
+        }
 
         Optional<UserEntity> userOpt = userService.getUserByUsername(username);
         if(userOpt.isPresent()) {

@@ -11,8 +11,6 @@ const StockTile = (stock) => {
     high
   } = stock.stockData;
 
-  console.log(open);
-
   const isPositive = percentChange >= 0;
 
   return (

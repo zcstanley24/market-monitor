@@ -3,6 +3,7 @@ package com.zach.market_monitor.controllers;
 import com.zach.market_monitor.services.APIService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,7 +33,14 @@ public class StockController {
 
     @Cacheable(cacheNames = "stocks")
     @GetMapping("/stock-data")
-    public String stockData(@RequestParam(defaultValue = "AAPL") String symbol, @RequestParam(defaultValue = "1day") String interval) {
+    public String stockData(@RequestParam(defaultValue = "AAPL, AMZN, GOOGL") String symbol, @RequestParam(defaultValue = "1day") String interval) {
+        //Fetch user's saved 3 stocks and set as symbol
+        return apiService.getQuote(symbol, interval);
+    }
+
+    @PutMapping("/followed-stocks")
+    public String stockData(@RequestParam(defaultValue = "AAPL, AMZN, GOOGL") String symbol, @RequestParam(defaultValue = "1day") String interval) {
+        //Fetch user's saved 3 stocks and set as symbol
         return apiService.getQuote(symbol, interval);
     }
 }

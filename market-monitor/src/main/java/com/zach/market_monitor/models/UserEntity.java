@@ -13,6 +13,11 @@ public class UserEntity {
     @Column(name = "role")
     private Set<String> roles = new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_stocks", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "followedStocks")
+    private Set<String> followedStocks = new HashSet<>();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -58,5 +63,13 @@ public class UserEntity {
 
     public void setRoles(Set<String> roles) {
         this.roles = roles;
+    }
+
+    public Set<String> getFollowedStocks() {
+        return followedStocks;
+    }
+
+    public void setFollowedStocks(Set<String> followedStocks) {
+        this.followedStocks = followedStocks;
     }
 }

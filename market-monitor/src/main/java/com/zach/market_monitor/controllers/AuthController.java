@@ -67,7 +67,7 @@ public class AuthController {
         try {
             String signupCheckResult = signupRequestVerification.verifySignup(registrationRequest);
             if(signupCheckResult == "Valid") {
-                userService.createUser(registrationRequest.getUsername(), registrationRequest.getPassword());
+                userService.createUser(registrationRequest.getUsername(), registrationRequest.getPassword(), registrationRequest.get);
                 return ResponseEntity.status(HttpStatus.OK).body("Success");
             }
             else {

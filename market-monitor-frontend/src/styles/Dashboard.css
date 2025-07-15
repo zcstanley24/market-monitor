@@ -1,0 +1,19 @@
+.followed-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.followed-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 24;
+  color: black;
+  text-align: center;
+  padding: 2rem;
+}
