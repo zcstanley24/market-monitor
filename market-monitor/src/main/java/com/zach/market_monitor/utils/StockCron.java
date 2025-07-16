@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -25,8 +26,8 @@ public class StockCron {
         List<String> targetedNames = List.of("AT&T", "Verizon", "T-Mobile");
         for (int i = 0; i < targetedSymbols.size(); i++) {
             String symbol = targetedSymbols.get(i);
-            StockPriceResponse stockPriceResponse = apiService.getCurrentPrice(symbol);
-            stockValueService.createStockValue(symbol, targetedNames.get(i), Double.parseDouble(stockPriceResponse.getPrice()));
+            StockPriceResponse stockPriceResponse = apiService.getQuote(symbol, "1day");
+            stockValueService.createStockValue(symbol, targetedNames.get(i), stockPriceResponse.getClose(), stockPriceResponse);
         }
     }
 }

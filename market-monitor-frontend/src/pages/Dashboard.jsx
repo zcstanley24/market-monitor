@@ -24,7 +24,8 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart,
+  Bar, ErrorBar,
 } from "recharts";
 import StockTile from '../components/StockTile.jsx';
 import '../styles/App.css';
@@ -86,7 +87,14 @@ const Dashboard = () => {
         else if(data?.code?.toString().startsWith("4") || data?.code?.toString().startsWith("5")) {
           setError("Failed to fetch stock data");
         }
-        setStockData(Object.values(data));
+        const mappedBarChartData = Object.values(data).map(item => ({
+          ...item,
+          close: Number(Number(item.close).toFixed(2)),
+          fifty_two_week_low: Number(item.fifty_two_week?.low).toFixed(2),
+          fifty_two_week_high: Number(item.fifty_two_week?.high).toFixed(2),
+          fifty_two_week_range: [Number((Number(item.close) - Number(item.fifty_two_week?.low)).toFixed(2)), Number((Number(item.fifty_two_week?.high) - Number(item.close)).toFixed(2))]
+        }));
+        setStockData(mappedBarChartData);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -115,13 +123,13 @@ const Dashboard = () => {
       .then((data) => {
         const grouped = {};
 
-        data.forEach(({ symbol, retrievedPrice, retrievalTime }) => {
+        data.forEach(({ name, symbol, retrievedPrice, retrievalTime }) => {
           const date = retrievalTime.slice(0, 10); 
           if (!grouped[date]) {
             grouped[date] = { retrievalTime: date };
           }
 
-          grouped[date][symbol] = retrievedPrice;
+          grouped[date][`${name} (${symbol})`] = retrievedPrice;
         });
 
         const chartData = Object.values(grouped).sort(
@@ -179,6 +187,20 @@ const Dashboard = () => {
       });
   };
 
+  const CustomBarChartTooltip = ({ active, payload }) => {
+    if (!active || !payload || !payload.length) return null;
+    const data = payload[0].payload;
+  
+    return (
+      <div className="custom-tooltip" style={{ background: '#fff', border: '1px solid #ccc', padding: 10 }}>
+        <p><strong>{data.symbol}</strong></p>
+        <p>Close: {data.close}</p>
+        <p>52w Low: {data.fifty_two_week_low}</p>
+        <p>52w High: {data.fifty_two_week_high}</p>
+      </div>
+    );
+  };
+
   return (
     <Flex height="100vh" width="100vw" flexDirection="column">
       <Box bg="blue.600" color="white" px={6} py={4} flexShrink={0}>
@@ -207,99 +229,134 @@ const Dashboard = () => {
           </VStack>
         </Box>
         <Box flex="1" bg="gray.50" p={6} overflowY="auto">
-          <VStack spacing={4}>
-            <HStack align="center" mb={2} gap={4} spacing={4}>
-              <Heading size="lg" mb={0} color="black">
-                My Followed Stocks
-              </Heading>
-              <Link fontSize="sm" onClick={() => setIsEditModalOpen(true)}>
-                Edit
-              </Link>
-              <Modal
-                open={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-              >
-                <MuiBox className="followed-modal">
-                  <Typography id="modal-title" variant="h6" component="h2">
-                    Edit Followed Stocks
-                  </Typography>
-                  <Typography id="modal-description" sx={{ mt: 2, mb: 2 }}>
-                    Please select your top 3 stocks from the dropdown below
-                  </Typography>
-                  {followedModalError && (
-                    <Typography color="red" mb={2}>
-                      {followedModalError}
+          <HStack spacing={4}>
+            <VStack spacing={4}>
+              <HStack align="center" mb={2} gap={4} spacing={4}>
+                <Heading size="lg" mb={0} color="black">
+                  My Followed Stocks
+                </Heading>
+                <Link fontSize="sm" onClick={() => setIsEditModalOpen(true)}>
+                  Edit
+                </Link>
+                <Modal
+                  open={isEditModalOpen}
+                  onClose={() => setIsEditModalOpen(false)}
+                >
+                  <MuiBox className="followed-modal">
+                    <Typography id="modal-title" variant="h6" component="h2">
+                      Edit Followed Stocks
                     </Typography>
-                  )}
-                  <FormControl fullWidth>
-                    <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
-                    <Select
-                      labelId="array-dropdown-label"
-                      id="array-dropdown"
-                      multiple
-                      value={selectedSymbols}
-                      onChange={handleFollowedDropdownChange}
-                      renderValue={(selected) => selected.join(", ")}
-                      label="Choose up to 3 options"
-                    >
-                      {options.map((option) => (
-                        <MenuItem key={option.name} value={option.symbol}>
-                          <Checkbox checked={selectedSymbols.includes(option.symbol)} />
-                          <ListItemText primary={option.name} />
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Box className="followed-modal-buttons">
-                    <Button onClick={() => setIsEditModalOpen(false)} sx={{ mt: 3 }} variant="outlined">
-                      Close
-                    </Button>
-                    <Button onClick={() => handleEditSelectedStocks()} sx={{ mt: 3 }} variant="outlined">
-                      {isFollowedModalLoading ? <CircularProgress size="20px"/> : "Submit" }
-                    </Button>
+                    <Typography id="modal-description" sx={{ mt: 2, mb: 2 }}>
+                      Please select your top 3 stocks from the dropdown below
+                    </Typography>
+                    {followedModalError && (
+                      <Typography color="red" mb={2}>
+                        {followedModalError}
+                      </Typography>
+                    )}
+                    <FormControl fullWidth>
+                      <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
+                      <Select
+                        labelId="array-dropdown-label"
+                        id="array-dropdown"
+                        multiple
+                        value={selectedSymbols}
+                        onChange={handleFollowedDropdownChange}
+                        renderValue={(selected) => selected.join(", ")}
+                        label="Choose up to 3 options"
+                      >
+                        {options.map((option) => (
+                          <MenuItem key={option.name} value={option.symbol}>
+                            <Checkbox checked={selectedSymbols.includes(option.symbol)} />
+                            <ListItemText primary={option.name} />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <Box className="followed-modal-buttons">
+                      <Button onClick={() => setIsEditModalOpen(false)} sx={{ mt: 3 }} variant="outlined">
+                        Close
+                      </Button>
+                      <Button onClick={() => handleEditSelectedStocks()} sx={{ mt: 3 }} variant="outlined">
+                        {isFollowedModalLoading ? <CircularProgress size="20px"/> : "Submit" }
+                      </Button>
+                    </Box>
+                  </MuiBox>
+                </Modal>
+              </HStack>
+              {isLoading && (
+                <div>
+                  Loading...
+                </div>
+              )}
+              <HStack spacing={4}>
+                {!isLoading && stockData.length && stockData.map((stock) => (
+                  <StockTile key={stock.symbol} stockData={stock} />
+                ))}
+              </HStack>
+              {error && (
+                <Text color="red">
+                  {error}
+                </Text>
+              )}
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    52-Week Price Range
+                  </Typography>
+                  <Box height={300} width={700}>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <ComposedChart data={stockData}>
+                        <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
+                        <XAxis dataKey="symbol" />
+                        <YAxis />
+                        <Tooltip content={<CustomBarChartTooltip />} />
+                        <Bar dataKey="close" barSize={20} fill="#8884d8">
+                          <ErrorBar
+                            dataKey="fifty_two_week_range"
+                            width={4}
+                            strokeWidth={2}
+                            direction="y"
+                          />
+                        </Bar>
+                      </ComposedChart>
+                    </ResponsiveContainer>
                   </Box>
-                </MuiBox>
-              </Modal>
-            </HStack>
-            {isLoading && (
-              <div>
-                Loading...
-              </div>
-            )}
-            <HStack spacing={4}>
-              {!isLoading && stockData.length && stockData.map((stock) => (
-                <StockTile key={stock.symbol} stockData={stock} />
-              ))}
-            </HStack>
-            {error && (
-              <Text color="red">
-                {error}
-              </Text>
-            )}
-            <Heading size="lg" mb={4} color="black">
-              Stocks of Interest
-            </Heading>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Stock Price (Last 5 Days)
-                </Typography>
-                <Box height={300} width={700}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={cronStockData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="retrievalTime" />
-                      <YAxis domain={['auto', 'auto']} />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="T" stroke="#1976d2" strokeWidth={2} />
-                      <Line type="monotone" dataKey="VZ" stroke="#2e7d32" strokeWidth={2} />
-                      <Line type="monotone" dataKey="TMUS" stroke="#f57c00" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </Box>
-              </CardContent>
-            </Card>
-          </VStack>
+                </CardContent>
+              </Card>
+            </VStack>
+            <VStack spacing={4}>
+              <Heading size="lg" mb={0} color="black">
+                Stocks of Interest
+              </Heading>
+              <HStack spacing={4}>
+                {!isLoading && stockData.length && stockData.map((stock) => (
+                  <StockTile key={stock.symbol} stockData={stock} />
+                ))}
+              </HStack>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Stock Price (Last 7 Days)
+                  </Typography>
+                  <Box height={300} width={700}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={cronStockData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="retrievalTime" />
+                        <YAxis domain={['auto', 'auto']} />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey={`AT&T (T)`} stroke="#1976d2" strokeWidth={2} />
+                        <Line type="monotone" dataKey={`Verizon (VZ)`} stroke="#2e7d32" strokeWidth={2} />
+                        <Line type="monotone" dataKey={`T-Mobile (TMUS)`} stroke="#f57c00" strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </Box>
+                </CardContent>
+              </Card>
+            </VStack>
+          </HStack>
         </Box>
       </Flex>
     </Flex>);

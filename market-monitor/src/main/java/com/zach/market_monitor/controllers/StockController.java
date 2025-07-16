@@ -7,6 +7,7 @@ import com.zach.market_monitor.security.JwtTokenProvider;
 import com.zach.market_monitor.services.APIService;
 import com.zach.market_monitor.services.StockValueService;
 import com.zach.market_monitor.services.UserService;
+import com.zach.market_monitor.utils.StockPriceResponse;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,11 +35,11 @@ public class StockController {
         this.stockValueService = stockValueService;
     }
 
-    @Cacheable(cacheNames = "quotes")
-    @GetMapping("/quote")
-    public String quote(@RequestParam(defaultValue = "AAPL") String symbol, @RequestParam(defaultValue = "1day") String interval) {
-        return apiService.getQuote(symbol, interval);
-    }
+//    @Cacheable(cacheNames = "quotes")
+//    @GetMapping("/quote")
+//    public String quote(@RequestParam(defaultValue = "AAPL") String symbol, @RequestParam(defaultValue = "1day") String interval) {
+//        return apiService.getQuote(symbol, interval);
+//    }
 
     @Cacheable(cacheNames = "stocks", unless = "#result.statusCodeValue != 200")
     @GetMapping("/stock-data")
@@ -59,9 +61,9 @@ public class StockController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through cookie");
         }
 
-        String quoteInfo = "";
+        Map<String, StockPriceResponse> quoteInfo = null;
         try {
-            quoteInfo = apiService.getQuote(userEntity.get().getFollowedStocks(), "1day");
+            quoteInfo = apiService.getQuotes(userEntity.get().getFollowedStocks(), "1day");
         } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching stock information");
         }

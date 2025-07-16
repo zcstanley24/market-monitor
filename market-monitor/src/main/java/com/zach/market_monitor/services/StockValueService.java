@@ -2,6 +2,7 @@ package com.zach.market_monitor.services;
 
 import com.zach.market_monitor.models.StockValueEntity;
 import com.zach.market_monitor.repositories.StockValueRepository;
+import com.zach.market_monitor.utils.StockPriceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class StockValueService {
         return stockValueRepository.findBySymbol(symbol);
     }
 
-    public StockValueEntity createStockValue(String symbol, String name, Double retrievedPrice) {
+    public StockValueEntity createStockValue(String symbol, String name, Double retrievedPrice, StockPriceResponse stockPriceResponse) {
         List<StockValueEntity> matchingEntries = stockValueRepository.findByNameOrderByRetrievalTimeDesc(name);
 
         if (!matchingEntries.isEmpty()) {
@@ -38,7 +39,7 @@ public class StockValueService {
             }
         }
 
-        StockValueEntity newEntry = new StockValueEntity(symbol, name, retrievedPrice, new Date());
+        StockValueEntity newEntry = new StockValueEntity(symbol, name, retrievedPrice, new Date(), stockPriceResponse);
         return stockValueRepository.save(newEntry);
     }
 
