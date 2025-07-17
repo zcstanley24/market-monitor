@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
-  Card,
-  CardContent,
   Modal,
   Typography,
   Button,
-  Box as MuiBox,
+  Box,
   FormControl,
   InputLabel,
   Select,
@@ -13,35 +11,27 @@ import {
   Checkbox,
   ListItemText,
   CircularProgress,
-} from '@mui/material';
-import {
-  Box,
-  Flex,
-  VStack,
-  HStack,
-  Text,
+  Stack,
   Link,
-  Heading,
-} from '@chakra-ui/react';
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart,
-  Bar, ErrorBar, BarChart, AreaChart, Area,
-} from "recharts";
+  Grid,
+} from '@mui/material';
+import MainToolbar from "../components/MainToolbar.jsx";
 import StockTile from '../components/StockTile.jsx';
+import FiftyTwoWeekRangeChart from '../components/FiftyTwoWeekRangeChart.jsx';
+import StockPerformanceTable from "../components/StockPerformanceTable.jsx";
+import VolumeChart from "../components/VolumeChart.jsx";
 import '../styles/App.css';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
   const [stockData, setStockData] = useState([]);
-  const [cronStockChartTimeSeriesData, setCronStockChartTimeSeriesData] = useState([]);
-  const [cronStockChartRangeData, setCronStockChartRangeData] = useState([]);
-  const [cronStockData, setCronStockData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFollowedModalLoading, setIsFollowedModalLoading] = useState(false);
   const [error, setError] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSymbols, setSelectedSymbols] = useState([]);
   const [followedModalError, setFollowedModalError] = useState("");
+  const [username, setUsername] = useState("");
   const options = [
     { name: "NVIDIA", symbol: "NVDA"},
     { name: "Microsoft", symbol: "MSFT"},
@@ -83,13 +73,15 @@ const Dashboard = () => {
         return res.json();
       })
       .then((data) => {
-        if(data?.code == 429) {
+        if(data?.quoteInfo?.code == 429) {
           setError("Maximum API calls exceeded. Please try again in a minute.");
         }
-        else if(data?.code?.toString().startsWith("4") || data?.code?.toString().startsWith("5")) {
+        else if(data?.quoteInfo?.code?.toString().startsWith("4") || data?.quoteInfo?.code?.toString().startsWith("5")) {
           setError("Failed to fetch stock data");
         }
-        const mappedBarChartData = Object.values(data).map(item => ({
+        setUsername(data?.username);
+        const quoteData = data?.quoteInfo;
+        const mappedBarChartData = Object.values(quoteData).map(item => ({
           ...item,
           close: Number(Number(item.close).toFixed(2)),
           fifty_two_week_low: Number(item.fifty_two_week?.low).toFixed(2),
@@ -150,203 +142,93 @@ const Dashboard = () => {
       });
   };
 
-  const Custom52WeekChartTooltip = ({ active, payload }) => {
-    if (!active || !payload || !payload.length) return null;
-    const data = payload[0].payload;
-  
-    return (
-      <div className="custom-tooltip" style={{ background: '#fff', border: '1px solid #ccc', padding: 10 }}>
-        <p><strong>{data.symbol}</strong></p>
-        <p>Close: {data.close}</p>
-        <p>52w Low: {data.fifty_two_week_low}</p>
-        <p>52w High: {data.fifty_two_week_high}</p>
-      </div>
-    );
-  };
-
-  const CustomVolumeChartTooltip = ({ active, payload }) => {
-    if (!active || !payload || !payload.length) return null;
-    const data = payload[0].payload;
-  
-    return (
-      <div className="custom-tooltip" style={{ color: 'black', background: '#fff', border: '1px solid #ccc', padding: 10 }}>
-        <p><strong>{data.symbol}</strong></p>
-        <p>Today's Volume: {Number(data.volume).toLocaleString()}</p>
-        <p>Average Volume: {Number(data.average_volume).toLocaleString()}</p>
-        <p>Relative Volatility: {data.relative_volatility}</p>
-      </div>
-    );
-  };
-
   return (
-    <Flex height="100vh" width="100vw" flexDirection="column">
-      <Box bg="blue.600" color="white" px={6} py={4} flexShrink={0}>
-        <Heading size="md">My Dashboard</Heading>
-      </Box>
-
-      <Flex flex="1" overflow="hidden">
-        <Box
-          bg="gray.800"
-          color="white"
-          width="250px"
-          padding={4}
-          flexShrink={0}
-          overflowY="auto"
-        >
-          <VStack align="start" spacing={4}>
-            <Link href="/" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
-              My Stocks
-            </Link>
-            <Link href="/stocks-of-interest" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
-              Stocks of Interest
-            </Link>
-            <Link href="#" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
-              Settings
-            </Link>
-          </VStack>
-        </Box>
-        <Box flex="1" bg="gray.50" p={6} overflowY="auto">
-          <HStack spacing={4}>
-            <VStack spacing={4}>
-              <HStack align="center" mb={2} gap={4} spacing={4}>
-                <Heading size="lg" mb={0} color="black">
-                  My Followed Stocks
-                </Heading>
-                <Link fontSize="sm" onClick={() => setIsEditModalOpen(true)}>
-                  Edit
-                </Link>
-                <Modal
-                  open={isEditModalOpen}
-                  onClose={() => setIsEditModalOpen(false)}
-                >
-                  <MuiBox className="followed-modal">
-                    <Typography id="modal-title" variant="h6" component="h2">
-                      Edit Followed Stocks
-                    </Typography>
-                    <Typography id="modal-description" sx={{ mt: 2, mb: 2 }}>
-                      Please select your top 3 stocks from the dropdown below
-                    </Typography>
-                    {followedModalError && (
-                      <Typography color="red" mb={2}>
-                        {followedModalError}
-                      </Typography>
-                    )}
-                    <FormControl fullWidth>
-                      <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
-                      <Select
-                        labelId="array-dropdown-label"
-                        id="array-dropdown"
-                        multiple
-                        value={selectedSymbols}
-                        onChange={handleFollowedDropdownChange}
-                        renderValue={(selected) => selected.join(", ")}
-                        label="Choose up to 3 options"
-                      >
-                        {options.map((option) => (
-                          <MenuItem key={option.name} value={option.symbol}>
-                            <Checkbox checked={selectedSymbols.includes(option.symbol)} />
-                            <ListItemText primary={option.name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <Box className="followed-modal-buttons">
-                      <Button onClick={() => setIsEditModalOpen(false)} sx={{ mt: 3 }} variant="outlined">
-                        Close
-                      </Button>
-                      <Button onClick={() => handleEditSelectedStocks()} sx={{ mt: 3 }} variant="outlined">
-                        {isFollowedModalLoading ? <CircularProgress size="20px"/> : "Submit" }
-                      </Button>
-                    </Box>
-                  </MuiBox>
-                </Modal>
-              </HStack>
-              {isLoading && (
-                <div>
-                  Loading...
-                </div>
-              )}
-              <HStack spacing={4}>
-                {!isLoading && stockData.length && stockData.map((stock) => (
-                  <StockTile key={stock.symbol} stockData={stock} />
-                ))}
-              </HStack>
-              {error && (
-                <Text color="red">
-                  {error}
-                </Text>
-              )}
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    52-Week Price Range
+    <Grid container className="dashboard" flexDirection="column">
+      <MainToolbar currentPage="dashboard" username={username}/>
+      <Grid>
+        <Box className="dashboard-content">
+          <Stack spacing={2}>
+            <Stack direction="row" align="center" mb={2} spacing={2}>
+              <Typography size="lg" mb={0} color="black">
+                My Followed Stocks
+              </Typography>
+              <Link fontSize="sm" onClick={() => setIsEditModalOpen(true)}>
+                Edit
+              </Link>
+              <Modal
+                open={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+              >
+                <Box className="followed-modal">
+                  <Typography id="modal-title" variant="h6" component="h2">
+                    Edit Followed Stocks
                   </Typography>
-                  <Box height={300} width={700}>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <ComposedChart data={stockData}>
-                        <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
-                        <XAxis dataKey="symbol" />
-                        <YAxis />
-                        <Tooltip content={<Custom52WeekChartTooltip />} />
-                        <Bar dataKey="close" barSize={20} fill="#8884d8">
-                          <ErrorBar
-                            dataKey="fifty_two_week_range"
-                            width={4}
-                            strokeWidth={2}
-                            direction="y"
-                          />
-                        </Bar>
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  </Box>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Trading Volume and Volatility
+                  <Typography id="modal-description" sx={{ mt: 2, mb: 2 }}>
+                    Please select your top 3 stocks from the dropdown below
                   </Typography>
-                  <Box height={300} width={700}>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={stockData} margin={{ top: 10, right: 20, left: 20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="symbol" />
-                        <YAxis 
-                          yAxisId="left"
-                          tickFormatter={(value) => {
-                            if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-                            if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
-                            return value;
-                          }}
-                          label={{ value: "Volume of Shares",  dx: -15, dy: 70, angle: -90, position: "insideLeft" }}
-                        />
-                        <YAxis
-                          yAxisId="right"
-                          orientation="right"
-                          label={{ value: "Relative Volatility", dx: 15, dy: 70, angle: 90, position: "insideRight" }}
-                        />
-                        <Tooltip content={<CustomVolumeChartTooltip />} />
-                        <Legend />
-                        <Bar yAxisId="left" dataKey="volume" fill="#8884d8" name="Today's Volume" />
-                        <Bar yAxisId="left" dataKey="average_volume" fill="#82ca9d" name="Average Volume" />
-                        <Line
-                          yAxisId="right"
-                          type="monotone"
-                          dataKey="relative_volatility"
-                          stroke="#ff7300"
-                          strokeWidth={2}
-                          name="Relative Volatility"
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
+                  {followedModalError && (
+                    <Typography color="red" mb={2}>
+                      {followedModalError}
+                    </Typography>
+                  )}
+                  <FormControl fullWidth>
+                    <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
+                    <Select
+                      labelId="array-dropdown-label"
+                      id="array-dropdown"
+                      multiple
+                      value={selectedSymbols}
+                      onChange={handleFollowedDropdownChange}
+                      renderValue={(selected) => selected.join(", ")}
+                      label="Choose up to 3 options"
+                    >
+                      {options.map((option) => (
+                        <MenuItem key={option.name} value={option.symbol}>
+                          <Checkbox checked={selectedSymbols.includes(option.symbol)} />
+                          <ListItemText primary={option.name} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Box className="followed-modal-buttons">
+                    <Button onClick={() => setIsEditModalOpen(false)} sx={{ mt: 3 }} variant="outlined">
+                      Close
+                    </Button>
+                    <Button onClick={() => handleEditSelectedStocks()} sx={{ mt: 3 }} variant="outlined">
+                      {isFollowedModalLoading ? <CircularProgress size="20px"/> : "Submit" }
+                    </Button>
                   </Box>
-                </CardContent>
-              </Card>
-            </VStack>
-          </HStack>
+                </Box>
+              </Modal>
+            </Stack>
+            {isLoading && (
+              <div>
+                Loading...
+              </div>
+            )}
+            <Stack direction="row">
+              <Box>
+                <Stack direction="row" spacing={4}>
+                  {!isLoading && stockData.length && stockData.map((stock) => (
+                    <StockTile key={stock.symbol} stockData={stock} />
+                  ))}
+                </Stack>
+                {error && (
+                  <Typography color="red">
+                    {error}
+                  </Typography>
+                )}
+                <FiftyTwoWeekRangeChart stockData={stockData} />
+              </Box>
+              <Stack>
+                <StockPerformanceTable stockData={stockData} />
+                <VolumeChart stockData={stockData} />
+              </Stack>
+            </Stack>
+          </Stack>
         </Box>
-      </Flex>
-    </Flex>);
+      </Grid>
+    </Grid>);
 }
 
 export default Dashboard

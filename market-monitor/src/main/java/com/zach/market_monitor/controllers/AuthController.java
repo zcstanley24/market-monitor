@@ -45,10 +45,10 @@ public class AuthController {
 
             ResponseCookie cookie = ResponseCookie.from("marketMonitorToken", jwt)
                     .httpOnly(true)
-                    .secure(false) // Set to true in prod with HTTPS
+                    .secure(false)
                     .path("/")
                     .maxAge(24 * 60 * 60) // 1 day
-                    .sameSite("Lax") // alt option Lax
+                    .sameSite("Lax")
                     .build();
 
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -56,6 +56,25 @@ public class AuthController {
             return ResponseEntity.ok("Login successful");
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        try {
+            ResponseCookie cookie = ResponseCookie.from("marketMonitorToken", "")
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(0)
+                    .sameSite("Lax")
+                    .build();
+
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+            return ResponseEntity.ok("Logout successful");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Encountered an error when expiring token");
         }
     }
 

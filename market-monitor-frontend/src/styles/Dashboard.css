@@ -1,3 +1,30 @@
+.dashboard {
+  background-color: #F1FFFF;
+  min-height: 100vh;
+  width: 100vw;;
+}
+
+.company-logo {
+  height: 2rem;
+}
+
+.current-page-caret {
+  position: absolute;
+  z-index: 0;
+  color: white;
+  border-left: 3rem solid transparent;
+  border-right: 3rem solid transparent;
+  border-top: 1.5rem solid #2E7D32;
+}
+
+.dashboard-content {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
 .followed-modal-buttons {
   display: flex;
   justify-content: space-between;

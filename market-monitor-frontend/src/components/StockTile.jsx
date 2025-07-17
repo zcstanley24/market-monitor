@@ -4,7 +4,7 @@ const StockTile = (stock) => {
   const {
     symbol,
     name,
-    open,
+    exchange,
     close,
     retrievedPrice,
     percent_change: percentChange,
@@ -19,15 +19,13 @@ const StockTile = (stock) => {
       <div style={styles.header}>
         <div style={styles.symbol}>{symbol}</div>
         <div style={styles.name}>{name}</div>
+        <div style={styles.name}>{exchange}</div>
       </div>
       <div style={styles.details}>
-        <div><strong>Open:</strong> ${open}</div>
         <div><strong>Close:</strong> ${close || retrievedPrice}</div>
         <div style={{ color: isPositive ? "green" : "red" }}>
           <strong>Change:</strong> {(+percentChange).toFixed(2)}%
         </div>
-        <div><strong>Low:</strong> ${low}</div>
-        <div><strong>High:</strong> ${high}</div>
       </div>
     </div>
   );

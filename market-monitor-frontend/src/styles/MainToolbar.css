@@ -1,0 +1,27 @@
+.error-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 24;
+  color: black;
+  text-align: center;
+  padding: 2rem;
+}
+
+.toolbar-buttons:hover {
+  :hover {
+    color: #dddddd;
+  }
+}
+
+.logout-button:hover {
+  color: #dddddd;
+  border-color: #dddddd;
+}
+
+.error-modal-button:hover {
+  border-color: #2E7D32;
+}

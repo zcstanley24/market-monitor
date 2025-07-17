@@ -15,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class StockController {
@@ -67,7 +64,10 @@ public class StockController {
         } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching stock information");
         }
-        return ResponseEntity.ok(quoteInfo);
+        Map<String, Object> response = new HashMap<>();
+        response.put("username", username);
+        response.put("quoteInfo", quoteInfo);
+        return ResponseEntity.ok(response);
     }
 
     @CacheEvict(cacheNames = "stocks", key = "#cookieValue")
