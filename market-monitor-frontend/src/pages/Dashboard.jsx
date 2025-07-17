@@ -25,7 +25,7 @@ import {
 } from '@chakra-ui/react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ComposedChart,
-  Bar, ErrorBar,
+  Bar, ErrorBar, BarChart, AreaChart, Area,
 } from "recharts";
 import StockTile from '../components/StockTile.jsx';
 import '../styles/App.css';
@@ -33,6 +33,8 @@ import '../styles/Dashboard.css';
 
 const Dashboard = () => {
   const [stockData, setStockData] = useState([]);
+  const [cronStockChartTimeSeriesData, setCronStockChartTimeSeriesData] = useState([]);
+  const [cronStockChartRangeData, setCronStockChartRangeData] = useState([]);
   const [cronStockData, setCronStockData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFollowedModalLoading, setIsFollowedModalLoading] = useState(false);
@@ -43,9 +45,9 @@ const Dashboard = () => {
   const options = [
     { name: "NVIDIA", symbol: "NVDA"},
     { name: "Microsoft", symbol: "MSFT"},
-    { name: "Google", symbol: "GOOG"},
-    { name: "Apple", symbol: "AAPL"},
-    { name: "Amazon", symbol: "AMZN"},
+    { name: "AT&T", symbol: "T"},
+    { name: "T-Mobile", symbol: "TMUS"},
+    { name: "Verizon", symbol: "VZ"},
     { name: "Meta", symbol: "META"},
     { name: "Broadcom", symbol: "AVGO"},
     { name: "Target", symbol: "TGT"},
@@ -92,7 +94,10 @@ const Dashboard = () => {
           close: Number(Number(item.close).toFixed(2)),
           fifty_two_week_low: Number(item.fifty_two_week?.low).toFixed(2),
           fifty_two_week_high: Number(item.fifty_two_week?.high).toFixed(2),
-          fifty_two_week_range: [Number((Number(item.close) - Number(item.fifty_two_week?.low)).toFixed(2)), Number((Number(item.fifty_two_week?.high) - Number(item.close)).toFixed(2))]
+          fifty_two_week_range: [Number((Number(item.close) - Number(item.fifty_two_week?.low)).toFixed(2)), Number((Number(item.fifty_two_week?.high) - Number(item.close)).toFixed(2))],
+          relative_volatility: Number(
+            Math.abs(item.volume - item.average_volume) / item.average_volume
+          ).toFixed(2)
         }));
         setStockData(mappedBarChartData);
         setIsLoading(false);
@@ -102,48 +107,6 @@ const Dashboard = () => {
         setIsLoading(false);
       });
   }, []);
-
-  useEffect(() => {
-    fetch("http://localhost:8080/cron-stock-data", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "include"
-    })
-      .then((res) => {
-        if(res.status === 403) {
-          window.location.href = '/login';
-        }
-        else if(!res.ok) {
-          throw new Error("Failed to fetch stock data");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        const grouped = {};
-
-        data.forEach(({ name, symbol, retrievedPrice, retrievalTime }) => {
-          const date = retrievalTime.slice(0, 10); 
-          if (!grouped[date]) {
-            grouped[date] = { retrievalTime: date };
-          }
-
-          grouped[date][`${name} (${symbol})`] = retrievedPrice;
-        });
-
-        const chartData = Object.values(grouped).sort(
-          (a, b) => new Date(a.retrievalTime) - new Date(b.retrievalTime)
-        );
-        setCronStockData(chartData);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setIsLoading(false);
-      });
-  }, []);
-
 
   const handleFollowedDropdownChange = (e) => {
     const newValues = e.target.value;
@@ -187,7 +150,7 @@ const Dashboard = () => {
       });
   };
 
-  const CustomBarChartTooltip = ({ active, payload }) => {
+  const Custom52WeekChartTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
     const data = payload[0].payload;
   
@@ -197,6 +160,20 @@ const Dashboard = () => {
         <p>Close: {data.close}</p>
         <p>52w Low: {data.fifty_two_week_low}</p>
         <p>52w High: {data.fifty_two_week_high}</p>
+      </div>
+    );
+  };
+
+  const CustomVolumeChartTooltip = ({ active, payload }) => {
+    if (!active || !payload || !payload.length) return null;
+    const data = payload[0].payload;
+  
+    return (
+      <div className="custom-tooltip" style={{ color: 'black', background: '#fff', border: '1px solid #ccc', padding: 10 }}>
+        <p><strong>{data.symbol}</strong></p>
+        <p>Today's Volume: {Number(data.volume).toLocaleString()}</p>
+        <p>Average Volume: {Number(data.average_volume).toLocaleString()}</p>
+        <p>Relative Volatility: {data.relative_volatility}</p>
       </div>
     );
   };
@@ -217,11 +194,11 @@ const Dashboard = () => {
           overflowY="auto"
         >
           <VStack align="start" spacing={4}>
-            <Link href="#" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
-              Home
+            <Link href="/" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
+              My Stocks
             </Link>
-            <Link href="#" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
-              Profile
+            <Link href="/stocks-of-interest" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
+              Stocks of Interest
             </Link>
             <Link href="#" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
               Settings
@@ -310,7 +287,7 @@ const Dashboard = () => {
                         <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
                         <XAxis dataKey="symbol" />
                         <YAxis />
-                        <Tooltip content={<CustomBarChartTooltip />} />
+                        <Tooltip content={<Custom52WeekChartTooltip />} />
                         <Bar dataKey="close" barSize={20} fill="#8884d8">
                           <ErrorBar
                             dataKey="fifty_two_week_range"
@@ -324,33 +301,43 @@ const Dashboard = () => {
                   </Box>
                 </CardContent>
               </Card>
-            </VStack>
-            <VStack spacing={4}>
-              <Heading size="lg" mb={0} color="black">
-                Stocks of Interest
-              </Heading>
-              <HStack spacing={4}>
-                {!isLoading && stockData.length && stockData.map((stock) => (
-                  <StockTile key={stock.symbol} stockData={stock} />
-                ))}
-              </HStack>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Stock Price (Last 7 Days)
+                    Trading Volume and Volatility
                   </Typography>
                   <Box height={300} width={700}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={cronStockData}>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={stockData} margin={{ top: 10, right: 20, left: 20, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="retrievalTime" />
-                        <YAxis domain={['auto', 'auto']} />
-                        <Tooltip />
+                        <XAxis dataKey="symbol" />
+                        <YAxis 
+                          yAxisId="left"
+                          tickFormatter={(value) => {
+                            if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                            if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+                            return value;
+                          }}
+                          label={{ value: "Volume of Shares",  dx: -15, dy: 70, angle: -90, position: "insideLeft" }}
+                        />
+                        <YAxis
+                          yAxisId="right"
+                          orientation="right"
+                          label={{ value: "Relative Volatility", dx: 15, dy: 70, angle: 90, position: "insideRight" }}
+                        />
+                        <Tooltip content={<CustomVolumeChartTooltip />} />
                         <Legend />
-                        <Line type="monotone" dataKey={`AT&T (T)`} stroke="#1976d2" strokeWidth={2} />
-                        <Line type="monotone" dataKey={`Verizon (VZ)`} stroke="#2e7d32" strokeWidth={2} />
-                        <Line type="monotone" dataKey={`T-Mobile (TMUS)`} stroke="#f57c00" strokeWidth={2} />
-                      </LineChart>
+                        <Bar yAxisId="left" dataKey="volume" fill="#8884d8" name="Today's Volume" />
+                        <Bar yAxisId="left" dataKey="average_volume" fill="#82ca9d" name="Average Volume" />
+                        <Line
+                          yAxisId="right"
+                          type="monotone"
+                          dataKey="relative_volatility"
+                          stroke="#ff7300"
+                          strokeWidth={2}
+                          name="Relative Volatility"
+                        />
+                      </BarChart>
                     </ResponsiveContainer>
                   </Box>
                 </CardContent>

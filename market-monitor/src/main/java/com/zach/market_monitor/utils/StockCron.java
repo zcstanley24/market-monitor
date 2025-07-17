@@ -22,8 +22,8 @@ public class StockCron {
 
     @Scheduled(cron = "0 0 * * * *")
     public void fetchPriceForPredefinedStocks() {
-        List<String> targetedSymbols = List.of("T", "VZ", "TMUS");
-        List<String> targetedNames = List.of("AT&T", "Verizon", "T-Mobile");
+        List<String> targetedSymbols = List.of("AAPL", "GOOG", "AMZN");
+        List<String> targetedNames = List.of("Apple", "Google", "Amazon");
         for (int i = 0; i < targetedSymbols.size(); i++) {
             String symbol = targetedSymbols.get(i);
             StockPriceResponse stockPriceResponse = apiService.getQuote(symbol, "1day");

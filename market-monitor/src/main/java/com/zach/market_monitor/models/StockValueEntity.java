@@ -19,7 +19,7 @@ public class StockValueEntity {
     private Double low;
     private Double high;
     private Double open;
-    private Double change;
+    private Double percent_change;
 
     public StockValueEntity() {}
 
@@ -31,7 +31,7 @@ public class StockValueEntity {
         this.low = Double.parseDouble(stockPriceInfo.getLow());
         this.high = Double.parseDouble(stockPriceInfo.getHigh());
         this.open = Double.parseDouble(stockPriceInfo.getOpen());
-        this.change = Double.parseDouble(stockPriceInfo.getChange());
+        this.percent_change = Double.parseDouble(stockPriceInfo.getPercent_change());
     }
 
     public Long getId() {
@@ -82,12 +82,12 @@ public class StockValueEntity {
         this.open = open;
     }
 
-    public double getChange() {
-        return change;
+    public double getPercent_change() {
+        return percent_change;
     }
 
-    public void setChange(double change) {
-        this.change = change;
+    public void setPercent_change(double change) {
+        this.percent_change = change;
     }
 
     public Double getRetrievedPrice() {
