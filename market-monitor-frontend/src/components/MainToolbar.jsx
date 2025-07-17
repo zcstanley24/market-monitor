@@ -57,11 +57,11 @@ const MainToolbar = ({currentPage, username}) => {
               <Typography className="current-page-caret" marginTop="0.75rem" marginLeft="1.25rem"/>
             )}
           </Link>
-          <Link href="/" className="toolbar-buttons" underline="none" variant="button">
+          <Link href="/pick-my-stocks" className="toolbar-buttons" underline="none" variant="button">
             <Typography color="white" fontFamily="system-ui" fontWeight={600}>
               Pick My Stocks
             </Typography>
-            {currentPage === "picks-stocks" && (
+            {currentPage === "pick-my-stocks" && (
               <Typography className="current-page-caret" marginTop="0.75rem" marginLeft="1rem"/>
             )}
           </Link>

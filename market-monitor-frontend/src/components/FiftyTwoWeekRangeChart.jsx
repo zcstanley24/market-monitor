@@ -28,10 +28,10 @@ const FiftyTwoWeekRangeChart = ({stockData}) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" mb={1}>
           52-Week Price Range
         </Typography>
-        <Box height={300} width={700}>
+        <Box height={300}>
           <ResponsiveContainer width="100%" height={300}>
             <ComposedChart data={stockData}>
               <CartesianGrid stroke="#eee" strokeDasharray="3 3" />

@@ -8,8 +8,6 @@ const StockTile = (stock) => {
     close,
     retrievedPrice,
     percent_change: percentChange,
-    low,
-    high
   } = stock.stockData;
 
   const isPositive = percentChange >= 0;
@@ -36,11 +34,10 @@ const styles = {
     border: "1px solid #ddd",
     borderRadius: "8px",
     padding: "16px",
-    width: "250px",
+    width: "100%",
     boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
     fontFamily: "Arial, sans-serif",
     backgroundColor: "#fff",
-    margin: "8px"
   },
   header: {
     marginBottom: "12px"

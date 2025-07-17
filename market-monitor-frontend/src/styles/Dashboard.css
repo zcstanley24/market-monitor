@@ -18,7 +18,6 @@
 }
 
 .dashboard-content {
-  padding: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,4 +42,23 @@
   color: black;
   text-align: center;
   padding: 2rem;
+}
+
+.MuiTableBody-root .MuiTableRow-root:hover {
+  background-color: #e3f2fd;
+  cursor: pointer;
+}
+
+.stock-performance-header {
+  text-align: center !important;
+  font-weight: bold !important;
+  padding: 0.5rem 0.5rem 0.5rem 0.25rem !important;
+  font-size: 0.95rem !important;
+  color: white !important;
+}
+
+.stock-performance-data {
+  text-align: right !important;
+  padding: 0.6rem 0.5rem 0.6rem 0.25rem !important;
+  font-size: 0.95rem !important;
 }
