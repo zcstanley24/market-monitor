@@ -55,10 +55,12 @@
   padding: 0.5rem 0.5rem 0.5rem 0.25rem !important;
   font-size: 0.95rem !important;
   color: white !important;
+  font-family: system-ui !important;
 }
 
 .stock-performance-data {
   text-align: right !important;
-  padding: 0.6rem 0.5rem 0.6rem 0.25rem !important;
+  padding: 0.55rem 0.5rem 0.55rem 0.25rem !important;
   font-size: 0.95rem !important;
+  font-family: system-ui !important;
 }

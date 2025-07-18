@@ -43,10 +43,10 @@ const Dashboard = () => {
       })
       .then((data) => {
         if(data?.quoteInfo?.code == 429) {
-          setError("Maximum API calls exceeded. Please try again in one minute.");
+          throw new Error("Maximum API calls exceeded. Please try again in one minute.");
         }
         else if(data?.quoteInfo?.code?.toString().startsWith("4") || data?.quoteInfo?.code?.toString().startsWith("5")) {
-          setError("Failed to fetch stock data. Please try again later.");
+          throw new Error("Failed to fetch stock data. Please try again later.");
         }
         setUsername(data?.username);
         const quoteData = data?.quoteInfo;
@@ -64,8 +64,14 @@ const Dashboard = () => {
         setIsLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
+        if (err.message === "Failed to fetch" || err.message.includes("NetworkError")) {
+          setError("Unable to connect to the server. Please check your internet or try again later.");
+        }
+        else {
+          setError(err.message);
+        }
         setIsLoading(false);
+        setIsErrorModalOpen(true);
       });
   }, []);
 
@@ -96,7 +102,7 @@ const Dashboard = () => {
       </Modal>
       <Box className="dashboard-content">
         {isLoading && (
-          <CircularProgress sx={{marginTop: "30vh !important"}} size={100} />
+          <CircularProgress size={100} />
         )}
         {!isLoading && (<Stack direction="row" gap={4}>
           <Stack gap={4} width={800}>

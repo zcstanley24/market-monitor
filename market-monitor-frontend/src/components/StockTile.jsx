@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
+import {
+  Typography,
+  Paper,
+  Stack
+} from "@mui/material";
 
 const StockTile = (stock) => {
   const {
@@ -13,49 +18,39 @@ const StockTile = (stock) => {
   const isPositive = percentChange >= 0;
 
   return (
-    <div style={styles.tile}>
-      <div style={styles.header}>
-        <div style={styles.symbol}>{symbol}</div>
-        <div style={styles.name}>{name}</div>
-        <div style={styles.name}>{exchange}</div>
-      </div>
-      <div style={styles.details}>
-        <div><strong>Close:</strong> ${close || retrievedPrice}</div>
-        <div style={{ color: isPositive ? "green" : "red" }}>
-          <strong>Change:</strong> {(+percentChange).toFixed(2)}%
-        </div>
-      </div>
-    </div>
-  );
-};
+    <Paper
+      elevation={3}
+      sx={{
+        borderRadius: 2,
+        p: 2,
+        width: "100%",
+        backgroundColor: "#fff"
+      }}
+    >
+      <Stack mb={1}>
+        <Typography variant="h5" fontWeight="bold" color="#2196f3" fontFamily="system-ui">
+          {symbol}
+        </Typography>
+        <Typography variant="body2" color="black" fontSize="1rem" fontFamily="system-ui">
+          {name}
+        </Typography>
+        <Typography variant="body2" color="black" fontFamily="system-ui">
+          {exchange}
+        </Typography>
+      </Stack>
 
-const styles = {
-  tile: {
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    padding: "16px",
-    width: "100%",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-    fontFamily: "Arial, sans-serif",
-    backgroundColor: "#fff",
-  },
-  header: {
-    marginBottom: "12px"
-  },
-  symbol: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    color: "#1a202c"
-  },
-  name: {
-    fontSize: "14px",
-    color: "#718096"
-  },
-  details: {
-    fontSize: "14px",
-    lineHeight: "1.6",
-    color: "#718096"
-  }
+      <Stack>
+        <Typography fontFamily="system-ui" fontWeight="500">
+          Close: ${close || retrievedPrice}
+        </Typography>
+        <Typography
+          sx={{ color: isPositive ? "success.main" : "error.main", fontFamily: "system-ui", fontWeight:"500" }}
+        >
+          Change: {(+percentChange).toFixed(2)}%
+        </Typography>
+      </Stack>
+    </Paper>
+  );
 };
 
 export default StockTile;
