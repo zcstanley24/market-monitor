@@ -1,52 +1,42 @@
 import React, { useState } from "react";
-import { Box, Input, Button, Text, Heading, VStack } from "@chakra-ui/react";
-import Tooltip from '../components/Tooltip.jsx';
 import {
-  Modal,
+  Box,
+  Button,
+  Container,
+  TextField,
   Typography,
-  Box as MuiBox,
+  Stack,
+  Paper,
+  Link,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Checkbox,
   ListItemText,
-  CircularProgress,
+  Tooltip,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import options from '../data/stockData.js';
+import { colors } from "../styles/colors";
+import mmGreenLogo from '../assets/mmgreenlogo.png';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [selectedSymbols, setSelectedSymbols] = useState([]);
-  const options = [
-    { name: "NVIDIA", symbol: "NVDA"},
-    { name: "Microsoft", symbol: "MSFT"},
-    { name: "Google", symbol: "GOOG"},
-    { name: "Apple", symbol: "AAPL"},
-    { name: "Amazon", symbol: "AMZN"},
-    { name: "Meta", symbol: "META"},
-    { name: "Broadcom", symbol: "AVGO"},
-    { name: "Target", symbol: "TGT"},
-    { name: "Tesla", symbol: "TSLA"},
-    { name: "JPMorgan Chase", symbol: "JPM"},
-    { name: "Walmart", symbol: "WMT"},
-    { name: "Eli Lilly", symbol: "LLY"},
-    { name: "Visa", symbol: "V"},
-    { name: "Oracle", symbol: "ORCL"},
-    { name: "Netflix", symbol: "NFLX"},
-    { name: "Mastercard", symbol: "MA"},
-    { name: "Exxon Mobil", symbol: "XOM"},
-    { name: "Costco", symbol: "COST"},
-    { name: "Johnson & Johnson", symbol: "JNJ"},
-    { name: "Home Depot", symbol: "HD"}
-  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if(!selectedSymbols.length) {
-      setError("Please choose at least one stock");
+    if(!selectedSymbols.length || selectedSymbols.length < 3) {
+      setError("Please ensure you have selected 3 stocks");
+      return;
+    }
+    else if(selectedSymbols.length > 3) {
+      setError("Please select only three stocks");
       return;
     }
 
@@ -65,6 +55,8 @@ const Register = () => {
     }
 
     const followedStocks = selectedSymbols.join(",");
+    const defaultErrorText = "Error encountered when attempting to register your new user. \
+        Please check your internet or try again later.";
 
     try {
       const response = await fetch("http://localhost:8080/auth/register", {
@@ -78,18 +70,14 @@ const Register = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        setError(errorText || "Registration failed");
-        return;
+        setError(errorText || defaultErrorText);
+      }
+      else {
+        navigate("/login", { state: { toastMessage: 'Your account was successfully created! Please log in to continue.' } });
       }
 
-      const data = await response.text();
-      console.log(data);
-
-      window.location.href = "/";
-
     } catch (err) {
-      setError("Network error");
-      console.error(err);
+      setError(defaultErrorText);
     }
   };
 
@@ -119,72 +107,235 @@ const Register = () => {
       setError("");
     }
     else {
-      setError("Please select less than or equal to 3 stocks");
+      setError("Please select only 3 stocks");
     }
     setSelectedSymbols(newValues);
   }
 
   return (
-    <Box
-      maxW="400px"
-      mx="auto"
-      mt="20"
-      p="8"
-      borderWidth="1px"
-      borderRadius="md"
-      boxShadow="md"
-    >
-      <Heading mb="6" textAlign="center">
-        Register for Market Monitor
-      </Heading>
+    <Stack sx={{minHeight: '100vh', minWidth: '100vw', justifyContent: 'center'}} style={{backgroundColor: colors.primaryGreen}}>
+      <Container maxWidth="xs">
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}
+          >
+            <Stack direction="row" sx={{ alignItems: 'center', gap: '0.75rem' }}>
+              <img src={mmGreenLogo} style={{
+                width: '50px',
+                height: '50px',
+                objectFit: 'cover',
+              }}/>
+              <Typography variant="h5" fontFamily="inter">
+                Market Monitor
+              </Typography>
+            </Stack>
+            <Typography sx={{fontFamily: 'system-ui', mt: 1.5, fontSize: '20px'}}>
+              Welcome! Please register below.
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              <Tooltip title="Please ensure your username is unique and contains between 8 and 30 characters."
+                placement="right" arrow 
+                slotProps={{
+                  tooltip: {
+                    sx: {
+                      backgroundColor: '#333',
+                      color: '#fff',
+                      fontSize: '0.95rem',
+                      padding: '8px 8px 8px 12px',
+                      borderRadius: '6px',
+                      fontFamily: 'system-ui',
+                    },
+                  },
+                  arrow: {
+                    sx: {
+                      color: '#333',
+                    },
+                  },
+                }}>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoFocus
+                  value={username}
+                  onChange={(e) => handleUsernameChange(e.target.value)}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontFamily: 'system-ui',
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontFamily: 'system-ui',
+                    },
+                  }}
+                />
+              </Tooltip>
+              <Tooltip title="Please ensure your password is between 8 and 30 characters,
+                as well as contains at least one lowercase, one uppercase, one numerical, 
+                and one special character."
+                placement="right" arrow 
+                slotProps={{
+                  tooltip: {
+                    sx: {
+                      backgroundColor: '#333',
+                      color: '#fff',
+                      fontSize: '0.95rem',
+                      padding: '8px 8px 8px 12px',
+                      borderRadius: '6px',
+                      fontFamily: 'system-ui',
+                    },
+                  },
+                  arrow: {
+                    sx: {
+                      color: '#333',
+                    },
+                  },
+                }}>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      fontFamily: 'system-ui',
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontFamily: 'system-ui',
+                    },
+                  }}
+                />
+              </Tooltip>
+              <FormControl fullWidth sx={{
+                mt: 2,
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'system-ui',
+                  fontSize: '1rem',
+                },
+                '& .MuiSelect-select': {
+                  fontFamily: 'system-ui',
+                  fontSize: '1rem',
+                },
+                '& .MuiMenuItem-root': {
+                  fontFamily: 'system-ui',
+                  fontSize: '0.9rem',
+                },
+              }}>
+                <InputLabel id="array-dropdown-label">Please select 3 stocks</InputLabel>
+                <Select
+                  labelId="array-dropdown-label"
+                  id="array-dropdown"
+                  multiple
+                  value={selectedSymbols}
+                  onChange={handleFollowedDropdownChange}
+                  renderValue={(selected) => selected.join(", ")}
+                  label="Please select 3 stocks"
+                >
+                  {options.map((option) => (
+                    <MenuItem key={option.name} value={option.symbol}>
+                      <Checkbox checked={selectedSymbols.includes(option.symbol)} />
+                      <ListItemText primary={option.name} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {error && (
+                <Typography color={colors.errorRed} mt={2} fontSize="sm" fontFamily="system-ui" textAlign="center">
+                  {error}
+                </Typography>
+              )}
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                style={{backgroundColor: colors.primaryGreen, fontFamily: 'system-ui'}}
+              >
+                Sign up
+              </Button>
+              <Typography sx={{fontFamily: "system-ui"}}>
+                Already registered? Click{' '}
+                <Link
+                  onClick={() => navigate("/login")}
+                  sx={{ padding: 0, minWidth: 'auto', cursor: 'pointer' }}
+                >
+                  here
+                </Link>{' '}to sign in
+              </Typography>
+            </Box>
+          </Box>
+        </Paper>
+      </Container>
+    </Stack>
+    // <Box
+    //   maxW="400px"
+    //   mx="auto"
+    //   mt="20"
+    //   p="8"
+    //   borderWidth="1px"
+    //   borderRadius="md"
+    //   boxShadow="md"
+    // >
+    //   <Heading mb="6" textAlign="center">
+    //     Register for Market Monitor
+    //   </Heading>
 
-      <form onSubmit={handleSubmit}>
-        <VStack spacing="4">
-          <Tooltip label="Please ensure your username contains only alphanumeric characters and is less than 20 characters">
-            <Input
-              placeholder="Username"
-              value={username}
-              onChange={(e) => handleUsernameChange(e.target.value)}
-            />
-          </Tooltip>
-          <Tooltip label="Please ensure your password contains at least one lowercase, uppercase, numerical, and special character.">
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => handlePasswordChange(e.target.value)}
-            />
-          </Tooltip>
-          {error && (
-            <Text color="red.500" fontSize="sm" textAlign="center">
-              {error}
-            </Text>
-          )}
-          <FormControl fullWidth>
-            <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
-            <Select
-              labelId="array-dropdown-label"
-              id="array-dropdown"
-              multiple
-              value={selectedSymbols}
-              onChange={handleFollowedDropdownChange}
-              renderValue={(selected) => selected.join(", ")}
-              label="Choose up to 3 options"
-            >
-              {options.map((option) => (
-                <MenuItem key={option.name} value={option.symbol}>
-                  <Checkbox checked={selectedSymbols.includes(option.symbol)} />
-                  <ListItemText primary={option.name} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button type="submit" colorScheme="blue" width="full">
-            Register
-          </Button>
-        </VStack>
-      </form>
-    </Box>
+    //   <form onSubmit={handleSubmit}>
+    //     <VStack spacing="4">
+    //       <Tooltip label="Please ensure your username contains only alphanumeric characters and is less than 20 characters">
+    //         <Input
+    //           placeholder="Username"
+    //           value={username}
+    //           onChange={(e) => handleUsernameChange(e.target.value)}
+    //         />
+    //       </Tooltip>
+    //       <Tooltip label="Please ensure your password contains at least one lowercase, uppercase, numerical, and special character.">
+    //         <Input
+    //           type="password"
+    //           placeholder="Password"
+    //           value={password}
+    //           onChange={(e) => handlePasswordChange(e.target.value)}
+    //         />
+    //       </Tooltip>
+    //       {error && (
+    //         <Text color="red.500" fontSize="sm" textAlign="center">
+    //           {error}
+    //         </Text>
+    //       )}
+    //       <FormControl fullWidth>
+    //         <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
+    //         <Select
+    //           labelId="array-dropdown-label"
+    //           id="array-dropdown"
+    //           multiple
+    //           value={selectedSymbols}
+    //           onChange={handleFollowedDropdownChange}
+    //           renderValue={(selected) => selected.join(", ")}
+    //           label="Choose up to 3 options"
+    //         >
+    //           {options.map((option) => (
+    //             <MenuItem key={option.name} value={option.symbol}>
+    //               <Checkbox checked={selectedSymbols.includes(option.symbol)} />
+    //               <ListItemText primary={option.name} />
+    //             </MenuItem>
+    //           ))}
+    //         </Select>
+    //       </FormControl>
+    //       <Button type="submit" colorScheme="blue" width="full">
+    //         Register
+    //       </Button>
+    //     </VStack>
+    //   </form>
+    // </Box>
   );
 }
 

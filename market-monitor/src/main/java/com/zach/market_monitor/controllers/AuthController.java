@@ -80,7 +80,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserSignupRequest registrationRequest) {
-        System.out.println(registrationRequest.getUsername());
         try {
             String signupCheckResult = signupRequestVerification.verifySignup(registrationRequest);
             if(signupCheckResult == "Valid") {

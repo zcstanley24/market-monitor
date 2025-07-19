@@ -45,9 +45,8 @@ public class UserService {
     }
 
     public boolean verifyFollowedStocks(String candidateStocks) {
-        Set<String> allowedStocks = Set.of("NVDA", "MSFT", "GOOG", "AAPL",
-                "AMZN", "META", "AVGO", "TGT", "TSLA", "JPM", "WMT", "LLY",
-                "V", "ORCL", "NFLX", "MA", "XOM", "COST", "JNJ", "HD");
+        Set<String> allowedStocks = Set.of("T", "AVGO", "COST", "LLY", "XOM", "HD", "JPM", "JNJ", "MA", "META",
+                "MSFT", "NFLX", "NVDA", "ORCL", "TGT", "TSLA", "TMUS", "VZ", "V", "WMT");
         Set<String> candidateStocksSet = Arrays.stream(candidateStocks.split(",")).collect(Collectors.toSet());
         return allowedStocks.containsAll(candidateStocksSet);
     }
