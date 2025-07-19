@@ -1,59 +1,28 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   Modal,
   Typography,
   Button,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  ListItemText,
   CircularProgress,
   Stack,
-  Link,
   Grid,
 } from '@mui/material';
 import MainToolbar from "../components/MainToolbar.jsx";
-import StockTile from '../components/StockTile.jsx';
-import FiftyTwoWeekRangeChart from '../components/FiftyTwoWeekRangeChart.jsx';
-import StockPerformanceTable from "../components/StockPerformanceTable.jsx";
-import VolumeChart from "../components/VolumeChart.jsx";
+import StockSelectionTile from '../components/StockSelectionTile.jsx';
+import options from '../data/stockData.js';
 import '../styles/App.css';
 import '../styles/Dashboard.css';
 
 const PickMyStocks = () => {
-  const [stockData, setStockData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFollowedModalLoading, setIsFollowedModalLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [selectedSymbols, setSelectedSymbols] = useState([]);
-  const [followedModalError, setFollowedModalError] = useState("");
   const [username, setUsername] = useState("");
-  const options = [
-    { name: "NVIDIA", symbol: "NVDA"},
-    { name: "Microsoft", symbol: "MSFT"},
-    { name: "AT&T", symbol: "T"},
-    { name: "T-Mobile", symbol: "TMUS"},
-    { name: "Verizon", symbol: "VZ"},
-    { name: "Meta", symbol: "META"},
-    { name: "Broadcom", symbol: "AVGO"},
-    { name: "Target", symbol: "TGT"},
-    { name: "Tesla", symbol: "TSLA"},
-    { name: "JPMorgan Chase", symbol: "JPM"},
-    { name: "Walmart", symbol: "WMT"},
-    { name: "Eli Lilly", symbol: "LLY"},
-    { name: "Visa", symbol: "V"},
-    { name: "Oracle", symbol: "ORCL"},
-    { name: "Netflix", symbol: "NFLX"},
-    { name: "Mastercard", symbol: "MA"},
-    { name: "Exxon Mobil", symbol: "XOM"},
-    { name: "Costco", symbol: "COST"},
-    { name: "Johnson & Johnson", symbol: "JNJ"},
-    { name: "Home Depot", symbol: "HD"}
-  ];
+  const navigate = useNavigate();
   
   useEffect(() => {
     fetch("http://localhost:8080/stock-data", {
@@ -65,56 +34,40 @@ const PickMyStocks = () => {
     })
       .then((res) => {
         if(res.status === 403) {
-          window.location.href = '/login';
+          navigate('/login');
         }
         else if(!res.ok) {
-          throw new Error("Failed to fetch stock data");
+          throw new Error("Failed to fetch stock data. Please try again later.");
         }
         return res.json();
       })
       .then((data) => {
         if(data?.quoteInfo?.code == 429) {
-          setError("Maximum API calls exceeded. Please try again in a minute.");
+          throw new Error("Maximum API calls exceeded. Please try again in one minute.");
         }
         else if(data?.quoteInfo?.code?.toString().startsWith("4") || data?.quoteInfo?.code?.toString().startsWith("5")) {
-          setError("Failed to fetch stock data");
+          throw new Error("Failed to fetch stock data. Please try again later.");
         }
         setUsername(data?.username);
         const quoteData = data?.quoteInfo;
-        const mappedBarChartData = Object.values(quoteData).map(item => ({
-          ...item,
-          close: Number(Number(item.close).toFixed(2)),
-          fifty_two_week_low: Number(item.fifty_two_week?.low).toFixed(2),
-          fifty_two_week_high: Number(item.fifty_two_week?.high).toFixed(2),
-          fifty_two_week_range: [Number((Number(item.close) - Number(item.fifty_two_week?.low)).toFixed(2)), Number((Number(item.fifty_two_week?.high) - Number(item.close)).toFixed(2))],
-          relative_volatility: Number(
-            Math.abs(item.volume - item.average_volume) / item.average_volume
-          ).toFixed(2)
-        }));
-        setStockData(mappedBarChartData);
+        setSelectedSymbols(Object.values(quoteData).map(item => item.symbol));
         setIsLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
+        if (err.message === "Failed to fetch" || err.message.includes("NetworkError")) {
+          setError("Unable to connect to the server. Please check your internet or try again later.");
+        }
+        else {
+          setError(err.message);
+        }
         setIsLoading(false);
+        setIsErrorModalOpen(true);
       });
-  }, []);
-
-  const handleFollowedDropdownChange = (e) => {
-    const newValues = e.target.value;
-
-    if(newValues.length <= 3) {
-      setFollowedModalError("");
-    }
-    else {
-      setFollowedModalError("Please select less than or equal to 3 stocks");
-    }
-    setSelectedSymbols(newValues);
-  }
+    }, []);
 
   const handleEditSelectedStocks = () => {
     if(selectedSymbols.length > 3) { return };
-    setIsFollowedModalLoading(true);
+    setIsSubmitting(true);
 
     fetch("http://localhost:8080/followed-stocks", {
       method: "PUT",
@@ -134,101 +87,94 @@ const PickMyStocks = () => {
         return;
       })
       .then(() => {
-        window.location.reload();
+        setIsSubmitting(false);
+        navigate("/", { state: { toastMessage: 'Your stocks were updated successfully!' } });
       })
       .catch((err) => {
-        setFollowedModalError(err.message);
-        setIsFollowedModalLoading(false);
+        setError(err.message);
+        setIsSubmitting(false);
+        setIsErrorModalOpen(true);
       });
   };
 
+  const handleErrorModalClose = () => {
+    setError("");
+    setIsErrorModalOpen(false);
+  };
+
+  const handleStockSelection = (symbol) => {
+    if(selectedSymbols.includes(symbol)) {
+      setSelectedSymbols(previous => previous.filter(stock => stock !== symbol))
+    }
+    else {
+      if(selectedSymbols.length > 2) {
+        setError("Please select less than or equal to 3 stocks");
+        setIsErrorModalOpen(true);
+      }
+      else {
+        setSelectedSymbols(previous => [...previous, symbol]);
+      }
+    }
+  };
+
   return (
-    <Grid container className="dashboard" flexDirection="column">
+    <Stack className="pick-my-stocks" sx={{alignItems: 'center'}}>
       <MainToolbar currentPage="pick-my-stocks" username={username}/>
-      <Grid>
-        <Box className="dashboard-content">
-          <Stack spacing={2}>
-            <Stack direction="row" align="center" mb={2} spacing={2}>
-              <Typography size="lg" mb={0} color="black">
-                My Followed Stocks
+      <Modal
+        open={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+      >
+        <Box className="error-modal" width={400}>
+          <Box>
+            <Typography variant="h4" fontFamily="system-ui">
+              Oops!
+            </Typography>
+            <Typography mt="1.5rem" fontFamily="system-ui">
+              {error}
+            </Typography>
+          </Box>
+          <Box mt="1.5rem">
+            <Button className="error-modal-button" onClick={() => handleErrorModalClose()} sx={{borderColor: "#2E7D32"}} variant="outlined">
+              <Typography color="#2E7D32">
+                Close
               </Typography>
-              <Link fontSize="sm" onClick={() => setIsEditModalOpen(true)}>
-                Edit
-              </Link>
-              <Modal
-                open={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-              >
-                <Box className="followed-modal">
-                  <Typography id="modal-title" variant="h6" component="h2">
-                    Edit Followed Stocks
-                  </Typography>
-                  <Typography id="modal-description" sx={{ mt: 2, mb: 2 }}>
-                    Please select your top 3 stocks from the dropdown below
-                  </Typography>
-                  {followedModalError && (
-                    <Typography color="red" mb={2}>
-                      {followedModalError}
-                    </Typography>
-                  )}
-                  <FormControl fullWidth>
-                    <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
-                    <Select
-                      labelId="array-dropdown-label"
-                      id="array-dropdown"
-                      multiple
-                      value={selectedSymbols}
-                      onChange={handleFollowedDropdownChange}
-                      renderValue={(selected) => selected.join(", ")}
-                      label="Choose up to 3 options"
-                    >
-                      {options.map((option) => (
-                        <MenuItem key={option.name} value={option.symbol}>
-                          <Checkbox checked={selectedSymbols.includes(option.symbol)} />
-                          <ListItemText primary={option.name} />
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Box className="followed-modal-buttons">
-                    <Button onClick={() => setIsEditModalOpen(false)} sx={{ mt: 3 }} variant="outlined">
-                      Close
-                    </Button>
-                    <Button onClick={() => handleEditSelectedStocks()} sx={{ mt: 3 }} variant="outlined">
-                      {isFollowedModalLoading ? <CircularProgress size="20px"/> : "Submit" }
-                    </Button>
-                  </Box>
-                </Box>
-              </Modal>
-            </Stack>
-            {isLoading && (
-              <div>
-                Loading...
-              </div>
-            )}
-            <Stack direction="row">
-              <Box>
-                <Stack direction="row" spacing={4}>
-                  {!isLoading && stockData.length && stockData.map((stock) => (
-                    <StockTile key={stock.symbol} stockData={stock} />
-                  ))}
-                </Stack>
-                {error && (
-                  <Typography color="red">
-                    {error}
-                  </Typography>
-                )}
-                <FiftyTwoWeekRangeChart stockData={stockData} />
-              </Box>
-              <Stack>
-                <StockPerformanceTable stockData={stockData} />
-                <VolumeChart stockData={stockData} />
-              </Stack>
-            </Stack>
-          </Stack>
+            </Button>
+          </Box>
         </Box>
-      </Grid>
-    </Grid>);
+      </Modal>
+      <Stack className="dashboard-content" spacing={3} mt={6} mb={6} width="70%" sx={{display: 'flex', alignItems: 'center'}}>
+        <Stack direction="row" align="center" mb={2} spacing={4} justifyContent="space-between">
+          <Button onClick={() => setSelectedSymbols([])} sx={{borderColor: "#2196f3"}} variant="outlined">
+            <Typography color="#2196f3">
+              Clear All
+            </Typography>
+          </Button>
+          <Typography fontFamily="system-ui" fontSize="20px" color="black">
+            Please select up to three stocks to display on your dashboard
+          </Typography>
+          <Button onClick={() => handleEditSelectedStocks()} sx={{borderColor: "#2196f3"}} variant="outlined">
+            <Typography color="#2196f3">
+              {isSubmitting ? <CircularProgress size="20px"/> : "Submit" }
+            </Typography>
+          </Button>
+        </Stack>
+        <Stack direction="row">
+          <Box>
+            <Grid container spacing={4}>
+              {!isLoading && options.map((stock) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }} key={stock.symbol}>
+                  <StockSelectionTile key={stock.symbol} 
+                    stock={stock} selectedSymbols={selectedSymbols} 
+                    handleStockSelection={handleStockSelection}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Stack>
+      </Stack>
+    </Stack>
+  );
 }
 
 export default PickMyStocks

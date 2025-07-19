@@ -49,7 +49,7 @@ const MainToolbar = ({currentPage, username}) => {
           </Typography>
         </Stack>
         <Stack direction="row" spacing={5}>
-          <Link href="/" className="toolbar-buttons" underline="none" variant="button">
+          <Link onClick={() => {navigate("/")}} className="toolbar-buttons" underline="none" variant="button" sx={{ cursor: "pointer" }}>
             <Typography color="white" fontFamily="system-ui" fontWeight={600}>
               My Dashboard
             </Typography>
@@ -57,7 +57,7 @@ const MainToolbar = ({currentPage, username}) => {
               <Typography className="current-page-caret" marginTop="0.75rem" marginLeft="1.25rem"/>
             )}
           </Link>
-          <Link href="/pick-my-stocks" className="toolbar-buttons" underline="none" variant="button">
+          <Link onClick={() => {navigate("/pick-my-stocks")}} className="toolbar-buttons" underline="none" variant="button" sx={{ cursor: "pointer" }}>
             <Typography color="white" fontFamily="system-ui" fontWeight={600}>
               Pick My Stocks
             </Typography>
@@ -65,7 +65,7 @@ const MainToolbar = ({currentPage, username}) => {
               <Typography className="current-page-caret" marginTop="0.75rem" marginLeft="1rem"/>
             )}
           </Link>
-          <Link href="/stocks-of-interest" className="toolbar-buttons" underline="none" variant="button">
+          <Link onClick={() => {navigate("/stocks-of-interest")}} className="toolbar-buttons" underline="none" variant="button" sx={{ cursor: "pointer" }}>
             <Typography color="white" fontFamily="system-ui" fontWeight={600}>
               Stocks of Interest
             </Typography>

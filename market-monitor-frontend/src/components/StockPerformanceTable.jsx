@@ -18,7 +18,7 @@ const StockPerformanceTable = ({stockData}) => {
         <TableHead>
           <TableRow sx={{ backgroundColor: "#2196f3" }}>
             {tableHeaders.map((header) => (
-              <TableCell className="stock-performance-header">{header}</TableCell>
+              <TableCell key={header} className="stock-performance-header">{header}</TableCell>
             ))}
           </TableRow>
         </TableHead>

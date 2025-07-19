@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Typography,
   Box,
@@ -13,6 +13,7 @@ import StockTile from '../components/StockTile.jsx';
 import FiftyTwoWeekRangeChart from '../components/FiftyTwoWeekRangeChart.jsx';
 import StockPerformanceTable from "../components/StockPerformanceTable.jsx";
 import VolumeChart from "../components/VolumeChart.jsx";
+import { toast } from 'react-toastify';
 import '../styles/App.css';
 import '../styles/Dashboard.css';
 
@@ -23,6 +24,14 @@ const Dashboard = () => {
   const [username, setUsername] = useState("");
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.toastMessage) {
+      toast.success(location.state.toastMessage);
+    }
+    window.history.replaceState({}, document.title);
+  }, [location.state]);
   
   useEffect(() => {
     fetch("http://localhost:8080/stock-data", {
@@ -76,7 +85,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <Stack className="dashboard" flexDirection="column">
+    <Stack className="dashboard">
       <MainToolbar currentPage="dashboard" username={username}/>
       <Modal
         open={isErrorModalOpen}

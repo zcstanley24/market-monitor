@@ -24,7 +24,12 @@ const StockTile = (stock) => {
         borderRadius: 2,
         p: 2,
         width: "100%",
-        backgroundColor: "#fff"
+        backgroundColor: "#fff",
+        transition: "all 0.3s ease",
+        '&:hover': {
+          backgroundColor: '#f5f5f5',
+          boxShadow: 6,
+        },
       }}
     >
       <Stack mb={1}>

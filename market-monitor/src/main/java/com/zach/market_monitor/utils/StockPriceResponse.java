@@ -180,6 +180,8 @@ public class StockPriceResponse {
         private String high_change;
         private String low_change_percent;
 
+        private String high_change_percent;
+
         public String getLow() {
             return low;
         }
@@ -218,6 +220,14 @@ public class StockPriceResponse {
 
         public void setLow_change_percent(String low_change_percent) {
             this.low_change_percent = low_change_percent;
+        }
+
+        public String getHigh_change_percent() {
+            return high_change_percent;
+        }
+
+        public void setHigh_change_percent(String high_change_percent) {
+            this.high_change_percent = high_change_percent;
         }
     }
 }
