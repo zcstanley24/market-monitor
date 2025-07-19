@@ -142,7 +142,12 @@ const PickMyStocks = () => {
           </Box>
         </Box>
       </Modal>
-      <Stack className="dashboard-content" spacing={3} mt={6} mb={6} width="70%" sx={{display: 'flex', alignItems: 'center'}}>
+      {isLoading && (
+        <Box className="dashboard-content" spacing={3} mt={6} mb={6}>
+          <CircularProgress size={100} />
+        </Box>
+      )}
+      {!isLoading && (<Stack className="dashboard-content" spacing={3} mt={6} mb={6} width="70%" sx={{display: 'flex', alignItems: 'center'}}>
         <Stack direction="row" align="center" mb={2} spacing={4} justifyContent="space-between">
           <Button onClick={() => setSelectedSymbols([])} sx={{borderColor: "#2196f3"}} variant="outlined">
             <Typography color="#2196f3">
@@ -159,20 +164,18 @@ const PickMyStocks = () => {
           </Button>
         </Stack>
         <Stack direction="row">
-          <Box>
-            <Grid container spacing={4}>
-              {!isLoading && options.map((stock) => (
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }} key={stock.symbol}>
-                  <StockSelectionTile key={stock.symbol} 
-                    stock={stock} selectedSymbols={selectedSymbols} 
-                    handleStockSelection={handleStockSelection}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+          <Grid container spacing={4}>
+            {options.map((stock) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }} key={stock.symbol}>
+                <StockSelectionTile key={stock.symbol} 
+                  stock={stock} selectedSymbols={selectedSymbols} 
+                  handleStockSelection={handleStockSelection}
+                />
+              </Grid>
+            ))}
+          </Grid>
         </Stack>
-      </Stack>
+      </Stack>)}
     </Stack>
   );
 }

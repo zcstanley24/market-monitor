@@ -13,12 +13,16 @@ public class StockValueEntity {
 
     private String symbol;
     private String name;
+
+    private String exchange;
     private Double retrievedPrice;
     private Date retrievalTime;
 
     private Double low;
     private Double high;
     private Double open;
+
+    private Double change;
     private Double percent_change;
 
     public StockValueEntity() {}
@@ -26,11 +30,13 @@ public class StockValueEntity {
     public StockValueEntity(String symbol, String name, Double retrievedPrice, Date retrievalTime, StockPriceResponse stockPriceInfo) {
         this.symbol = symbol;
         this.name = name;
+        this.exchange = stockPriceInfo.getExchange();
         this.retrievedPrice = retrievedPrice;
         this.retrievalTime = retrievalTime;
         this.low = Double.parseDouble(stockPriceInfo.getLow());
         this.high = Double.parseDouble(stockPriceInfo.getHigh());
         this.open = Double.parseDouble(stockPriceInfo.getOpen());
+        this.change = Double.parseDouble(stockPriceInfo.getChange());
         this.percent_change = Double.parseDouble(stockPriceInfo.getPercent_change());
     }
 
@@ -58,6 +64,14 @@ public class StockValueEntity {
         this.name = name;
     }
 
+    public String getExchange() {
+        return exchange;
+    }
+
+    public void setExchange(String exchange) {
+        this.exchange = exchange;
+    }
+
     public double getLow() {
         return low;
     }
@@ -80,6 +94,14 @@ public class StockValueEntity {
 
     public void setOpen(double open) {
         this.open = open;
+    }
+
+    public double getChange() {
+        return change;
+    }
+
+    public void setChange(double change) {
+        this.change = change;
     }
 
     public double getPercent_change() {

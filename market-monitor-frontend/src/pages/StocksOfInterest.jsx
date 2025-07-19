@@ -1,58 +1,29 @@
 import React, { useEffect, useState } from "react";
 import {
-  Card,
-  CardContent,
+  Modal,
   Typography,
-  Box as MuiBox,
-} from '@mui/material';
-import {
+  Button,
   Box,
-  Flex,
-  VStack,
-  HStack,
-  Link,
-  Heading,
-} from '@chakra-ui/react';
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area,
-} from "recharts";
+  CircularProgress,
+  Stack,
+  Grid,
+} from '@mui/material';
 import StockTile from '../components/StockTile.jsx';
+import MainToolbar from "../components/MainToolbar.jsx";
+import SevenDayTimeSeries from "../components/SevenDayTimeSeries.jsx";
+import SevenDayVariationChart from "../components/SevenDayVariationChart.jsx";
+import StockPerformanceTable from "../components/StockPerformanceTable.jsx";
 import '../styles/App.css';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
-  const [stockData, setStockData] = useState([]);
   const [cronStockChartTimeSeriesData, setCronStockChartTimeSeriesData] = useState([]);
   const [cronStockChartRangeData, setCronStockChartRangeData] = useState([]);
   const [cronStockData, setCronStockData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFollowedModalLoading, setIsFollowedModalLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedSymbols, setSelectedSymbols] = useState([]);
-  const [followedModalError, setFollowedModalError] = useState("");
-  const options = [
-    { name: "NVIDIA", symbol: "NVDA"},
-    { name: "Microsoft", symbol: "MSFT"},
-    { name: "AT&T", symbol: "T"},
-    { name: "T-Mobile", symbol: "TMUS"},
-    { name: "Verizon", symbol: "VZ"},
-    { name: "Meta", symbol: "META"},
-    { name: "Broadcom", symbol: "AVGO"},
-    { name: "Target", symbol: "TGT"},
-    { name: "Tesla", symbol: "TSLA"},
-    { name: "JPMorgan Chase", symbol: "JPM"},
-    { name: "Walmart", symbol: "WMT"},
-    { name: "Eli Lilly", symbol: "LLY"},
-    { name: "Visa", symbol: "V"},
-    { name: "Oracle", symbol: "ORCL"},
-    { name: "Netflix", symbol: "NFLX"},
-    { name: "Mastercard", symbol: "MA"},
-    { name: "Exxon Mobil", symbol: "XOM"},
-    { name: "Costco", symbol: "COST"},
-    { name: "Johnson & Johnson", symbol: "JNJ"},
-    { name: "Home Depot", symbol: "HD"}
-  ];
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:8080/cron-stock-data", {
@@ -72,10 +43,18 @@ const Dashboard = () => {
         return res.json();
       })
       .then((data) => {
+        setUsername(data?.username);
+        const quoteInfo = data?.quoteInfo;
+        const mappedQuoteData = Object.values(quoteInfo).map(item => ({
+          ...item,
+          close: item.retrievedPrice,
+        }));
+        const stockTileData = mappedQuoteData.slice(0,3).sort((a, b) => a.symbol.localeCompare(b.symbol));
+
         const groupedTimeSeries = {};
         const groupedRange = {};
 
-        data.forEach(({ name, symbol, retrievedPrice, retrievalTime, low, high }) => {
+        quoteInfo.forEach(({ name, symbol, retrievedPrice, retrievalTime, low, high }) => {
           const date = retrievalTime.slice(0, 10); 
           if (!groupedTimeSeries[date]) {
             groupedTimeSeries[date] = { retrievalTime: date };
@@ -88,7 +67,6 @@ const Dashboard = () => {
           groupedTimeSeries[date][`${name} (${symbol})`] = retrievedPrice;
           groupedRange[date][`${name} (${symbol})`] = high - low;
         });
-
         const timeSeriesData = Object.values(groupedTimeSeries).sort(
           (a, b) => new Date(a.retrievalTime) - new Date(b.retrievalTime)
         );
@@ -97,7 +75,7 @@ const Dashboard = () => {
         );
         setCronStockChartTimeSeriesData(timeSeriesData);
         setCronStockChartRangeData(rangeData);
-        setCronStockData(data);
+        setCronStockData(stockTileData);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -106,126 +84,51 @@ const Dashboard = () => {
       });
   }, []);
 
-  const CustomVolumeChartTooltip = ({ active, payload }) => {
-    if (!active || !payload || !payload.length) return null;
-    const data = payload[0].payload;
-  
-    return (
-      <div className="custom-tooltip" style={{ color: 'black', background: '#fff', border: '1px solid #ccc', padding: 10 }}>
-        <p><strong>{data.symbol}</strong></p>
-        <p>Today's Volume: {Number(data.volume).toLocaleString()}</p>
-        <p>Average Volume: {Number(data.average_volume).toLocaleString()}</p>
-        <p>Relative Volatility: {data.relative_volatility}</p>
-      </div>
-    );
-  };
-
   return (
-    <Flex height="100vh" width="100vw" flexDirection="column">
-      <Box bg="blue.600" color="white" px={6} py={4} flexShrink={0}>
-        <Heading size="md">My Dashboard</Heading>
-      </Box>
-
-      <Flex flex="1" overflow="hidden">
-        <Box
-          bg="gray.800"
-          color="white"
-          width="250px"
-          padding={4}
-          flexShrink={0}
-          overflowY="auto"
-        >
-          <VStack align="start" spacing={4}>
-            <Link href="/" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
-              My Stocks
-            </Link>
-            <Link href="/stocks-of-interest" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
-              Stocks of Interest
-            </Link>
-            <Link href="#" _hover={{ textDecoration: "none", bg: "gray.700" }} px={2} py={1} rounded="md" width="100%">
-              Settings
-            </Link>
-          </VStack>
+    <Stack className="dashboard">
+      <MainToolbar currentPage="stocks-of-interest" username={username}/>
+      <Modal
+        open={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+      >
+        <Box className="error-modal" width={400}>
+          <Box>
+            <Typography variant="h4" fontFamily="system-ui">
+              Oops!
+            </Typography>
+            <Typography mt="1.5rem" fontFamily="system-ui">
+              {error}
+            </Typography>
+          </Box>
+          <Box mt="1.5rem">
+            <Button className="error-modal-button" onClick={() => setIsErrorModalOpen(false)} sx={{borderColor: "#2E7D32"}} variant="outlined">
+              <Typography color="#2E7D32">
+                Close
+              </Typography>
+            </Button>
+          </Box>
         </Box>
-        <Box flex="1" bg="gray.50" p={6} overflowY="auto">
-          <HStack spacing={4}>
-            <VStack spacing={4}>
-              <Heading size="lg" mb={0} color="black">
-                Stocks of Interest
-              </Heading>
-              <HStack spacing={4}>
-                {!isLoading && cronStockData.length && cronStockData.slice(0,3).map((stock) => (
-                  <StockTile key={stock.symbol} stockData={stock} />
-                ))}
-              </HStack>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Stock Price (Last 7 Days)
-                  </Typography>
-                  <Box height={300} width={700}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={cronStockChartTimeSeriesData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="retrievalTime" />
-                        <YAxis domain={['auto', 'auto']} />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey={`Apple (AAPL)`} stroke="#1976d2" strokeWidth={2} />
-                        <Line type="monotone" dataKey={`Google (GOOG)`} stroke="#2e7d32" strokeWidth={2} />
-                        <Line type="monotone" dataKey={`Amazon (AMZN)`} stroke="#f57c00" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </Box>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Price Range (Last 7 Days)
-                  </Typography>
-                  <Box height={400} width={700}>
-                    <ResponsiveContainer width="100%" height={400}>
-                      <AreaChart data={cronStockChartRangeData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="retrievalTime" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Area
-                          type="monotone"
-                          dataKey="Apple (AAPL)"
-                          stackId="1"
-                          stroke="#8884d8"
-                          fill="#8884d8"
-                          name="Apple"
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="Google (GOOG)"
-                          stackId="1"
-                          stroke="#82ca9d"
-                          fill="#82ca9d"
-                          name="Google"
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="Amazon (AMZN)"
-                          stackId="1"
-                          stroke="#ffc658"
-                          fill="#ffc658"
-                          name="Amazon"
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </Box>
-                </CardContent>
-              </Card>
-            </VStack>
-          </HStack>
-        </Box>
-      </Flex>
-    </Flex>);
+      </Modal>
+      <Grid container className="dashboard-content">
+        {isLoading && (
+          <CircularProgress size={100} />
+        )}
+        {!isLoading && (<Stack direction="row" gap={4}>
+          <Stack gap={4} width={800}>
+            <Stack direction="row" gap={2}>
+              {cronStockData.map((stock) => (
+                <StockTile key={stock.symbol} stockData={stock} />
+              ))}
+            </Stack>
+            <SevenDayTimeSeries data={cronStockChartTimeSeriesData}/>
+          </Stack>
+          <Stack gap={4} width={800}>
+            <StockPerformanceTable stockData={cronStockData} />
+            <SevenDayVariationChart data={cronStockChartRangeData} />
+          </Stack>
+        </Stack>)}
+      </Grid>
+    </Stack>);
 }
 
 export default Dashboard

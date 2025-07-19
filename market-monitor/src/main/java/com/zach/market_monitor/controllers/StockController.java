@@ -101,13 +101,33 @@ public class StockController {
     }
 
     @GetMapping("/cron-stock-data")
-    public ResponseEntity<?> cronStockData() {
+    public ResponseEntity<?> cronStockData(@CookieValue(value = "marketMonitorToken", required = false) String cookieValue) {
+        if (cookieValue == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing cookie");
+        }
+
+        String username = null;
+        Optional<UserEntity> userEntity;
+        try {
+            username = jwtTokenProvider.getUsernameFromToken(cookieValue);
+            userEntity = userService.getUserByUsername(username);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through cookie");
+        }
+
+        if(userEntity.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through cookie");
+        }
+
         List<StockValueEntity> cronInfo = null;
         try {
             cronInfo = stockValueService.getAllSavedStockValues();
         } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching stock information");
         }
-        return ResponseEntity.ok(cronInfo);
+        Map<String, Object> response = new HashMap<>();
+        response.put("username", username);
+        response.put("quoteInfo", cronInfo);
+        return ResponseEntity.ok(response);
     }
 }
