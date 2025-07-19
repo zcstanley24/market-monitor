@@ -276,66 +276,6 @@ const Register = () => {
         </Paper>
       </Container>
     </Stack>
-    // <Box
-    //   maxW="400px"
-    //   mx="auto"
-    //   mt="20"
-    //   p="8"
-    //   borderWidth="1px"
-    //   borderRadius="md"
-    //   boxShadow="md"
-    // >
-    //   <Heading mb="6" textAlign="center">
-    //     Register for Market Monitor
-    //   </Heading>
-
-    //   <form onSubmit={handleSubmit}>
-    //     <VStack spacing="4">
-    //       <Tooltip label="Please ensure your username contains only alphanumeric characters and is less than 20 characters">
-    //         <Input
-    //           placeholder="Username"
-    //           value={username}
-    //           onChange={(e) => handleUsernameChange(e.target.value)}
-    //         />
-    //       </Tooltip>
-    //       <Tooltip label="Please ensure your password contains at least one lowercase, uppercase, numerical, and special character.">
-    //         <Input
-    //           type="password"
-    //           placeholder="Password"
-    //           value={password}
-    //           onChange={(e) => handlePasswordChange(e.target.value)}
-    //         />
-    //       </Tooltip>
-    //       {error && (
-    //         <Text color="red.500" fontSize="sm" textAlign="center">
-    //           {error}
-    //         </Text>
-    //       )}
-    //       <FormControl fullWidth>
-    //         <InputLabel id="array-dropdown-label">Choose up to 3 stocks</InputLabel>
-    //         <Select
-    //           labelId="array-dropdown-label"
-    //           id="array-dropdown"
-    //           multiple
-    //           value={selectedSymbols}
-    //           onChange={handleFollowedDropdownChange}
-    //           renderValue={(selected) => selected.join(", ")}
-    //           label="Choose up to 3 options"
-    //         >
-    //           {options.map((option) => (
-    //             <MenuItem key={option.name} value={option.symbol}>
-    //               <Checkbox checked={selectedSymbols.includes(option.symbol)} />
-    //               <ListItemText primary={option.name} />
-    //             </MenuItem>
-    //           ))}
-    //         </Select>
-    //       </FormControl>
-    //       <Button type="submit" colorScheme="blue" width="full">
-    //         Register
-    //       </Button>
-    //     </VStack>
-    //   </form>
-    // </Box>
   );
 }
 

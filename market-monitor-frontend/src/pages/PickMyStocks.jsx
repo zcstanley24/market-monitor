@@ -66,7 +66,11 @@ const PickMyStocks = () => {
     }, []);
 
   const handleEditSelectedStocks = () => {
-    if(selectedSymbols.length > 3) { return };
+    if(selectedSymbols.length != 3) { 
+      setError("Please select 3 stocks."); 
+      setIsErrorModalOpen(true);
+      return;
+    };
     setIsSubmitting(true);
 
     fetch("http://localhost:8080/followed-stocks", {
@@ -79,7 +83,7 @@ const PickMyStocks = () => {
     })
       .then((res) => {
         if(res.status === 403) {
-          window.location.href = '/login';
+          navigate("/login");
         }
         else if(!res.ok) {
           throw new Error("Failed to update followed stocks");
@@ -113,7 +117,7 @@ const PickMyStocks = () => {
     }
     else {
       if(selectedSymbols.length > 2) {
-        setError("Please select less than or equal to 3 stocks");
+        setError("Please select only 3 stocks.");
         setIsErrorModalOpen(true);
       }
       else {
@@ -160,7 +164,7 @@ const PickMyStocks = () => {
             </Typography>
           </Button>
           <Typography fontFamily="system-ui" fontSize="20px" color="black">
-            Please select up to three stocks to display on your dashboard
+            Please select 3 stocks to display on your dashboard
           </Typography>
           <Button onClick={() => handleEditSelectedStocks()} sx={{borderColor: "#2196f3"}} variant="outlined">
             <Typography color="#2196f3">

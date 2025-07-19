@@ -23,10 +23,10 @@ const Login = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const message = location.state?.toastMessage;
-    if (message) {
-      toast.success(message);
+    if (location.state?.toastMessage) {
+      toast.success(location.state.toastMessage);
     }
+    window.history.replaceState({}, document.title);
   }, [location.state]);
 
   const handleSubmit = async (e) => {
