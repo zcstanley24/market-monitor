@@ -7,6 +7,8 @@ import {
   CircularProgress,
   Modal,
   Button,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import MainToolbar from "../components/MainToolbar.jsx";
@@ -27,6 +29,8 @@ const Dashboard = () => {
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
   useEffect(() => {
     if (location.state?.toastMessage) {
@@ -122,16 +126,16 @@ const Dashboard = () => {
             <Typography sx={{fontFamily: "system-ui", fontSize: '40px', color: 'error.main'}}>No data found</Typography>
           </Stack>
         )}
-        {!isLoading && !failedToLoad && (<Stack direction="row" gap={4}>
-          <Stack gap={4} width={800}>
-            <Stack direction="row" gap={2}>
+        {!isLoading && !failedToLoad && (<Stack direction={isSmallScreen ? "column" : "row"} gap={4}>
+          <Stack gap={4} mt={isSmallScreen ? 10 : 0} width={isSmallScreen ? "100%" : 800}>
+            <Stack direction="row" flexWrap="wrap" gap={2}>
               {stockData.map((stock) => (
                 <StockTile key={stock.symbol} stockData={stock} />
               ))}
             </Stack>
             <FiftyTwoWeekRangeChart stockData={stockData} />
           </Stack>
-          <Stack gap={4}>
+          <Stack gap={4}  mb={isSmallScreen ? 10 : 0}>
             <StockPerformanceTable stockData={stockData} />
             <VolumeChart stockData={stockData} />
           </Stack>

@@ -88,20 +88,14 @@ const VolumeChart = ({stockData}) => {
         <ResponsiveContainer width={750} height={300}>
           <BarChart data={stockData} 
             margin={{ top: 10, right: 20, left: 20, bottom: 0 }}
-            series={[
-              { id: 0, data: [10, 15], label: 'Series A', labelMarkType: 'line' },
-              { id: 1, data: [15, 20], label: 'Series B', labelMarkType: 'line' },
-              { id: 2, data: [20, 25], label: 'Series C' },
-              { id: 3, data: [10, 15], label: 'Series D', labelMarkType: 'line' },
-            ]}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="symbol" tick={{style: { fontWeight: "500" }}} />
             <YAxis 
               yAxisId="left"
               tickFormatter={(value) => {
-                if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
-                if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+                if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+                if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
                 return value;
               }}
               label={{ value: "Volume of Shares",  dx: -15, dy: 70, angle: -90, position: "insideLeft",

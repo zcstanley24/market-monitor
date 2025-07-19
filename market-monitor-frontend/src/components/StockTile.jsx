@@ -2,10 +2,14 @@ import React from "react";
 import {
   Typography,
   Paper,
-  Stack
+  Stack,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 const StockTile = (stock) => {
+  const theme = useTheme();
+  const isSmallerScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const {
     symbol,
     name,
@@ -23,7 +27,6 @@ const StockTile = (stock) => {
       sx={{
         borderRadius: 2,
         p: 2,
-        width: "100%",
         backgroundColor: "#fff",
         transition: "all 0.3s ease",
         '&:hover': {
@@ -31,6 +34,7 @@ const StockTile = (stock) => {
           boxShadow: 6,
         },
       }}
+      style={{width: isSmallerScreen ? "48%" : "32%"}}
     >
       <Stack mb={1}>
         <Typography variant="h5" fontWeight="bold" color="#2196f3" fontFamily="system-ui">
