@@ -8,6 +8,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
+import { colors } from "../styles/colors";
 
 const StockPerformanceTable = ({stockData}) => {
   const tableHeaders = ["Company Name", "Open", "Close", "Low", "High", "Change", "Change (%)"];
@@ -16,7 +17,7 @@ const StockPerformanceTable = ({stockData}) => {
     <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
       <Table>
         <TableHead>
-          <TableRow sx={{ backgroundColor: "#2196f3" }}>
+          <TableRow style={{ backgroundColor: colors.secondaryBlue }}>
             {tableHeaders.map((header) => (
               <TableCell key={header} className="stock-performance-header">{header}</TableCell>
             ))}

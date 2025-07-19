@@ -21,14 +21,14 @@ const VolumeChart = ({stockData}) => {
         <Typography sx={{fontWeight: "bold", fontFamily: "system-ui"}}>{data.symbol}</Typography>
         <Stack direction="row" gap={1}>
           <Stack sx={{display: 'flex', alignItems: 'flex-end'}}>
-            <Typography sx={{fontFamily: "system-ui"}}>Today's Volume:</Typography>
-            <Typography sx={{fontFamily: "system-ui"}}>Average Volume:</Typography>
-            <Typography sx={{fontFamily: "system-ui"}}>Relative Volatility:</Typography>
+            <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryBlue, fontWeight: "500"}}>Today's Volume:</Typography>
+            <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryGreen, fontWeight: "500"}}>Average Volume:</Typography>
+            <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryPurple, fontWeight: "500"}}>Relative Volatility:</Typography>
           </Stack>
           <Stack sx={{display: 'flex', alignItems: 'flex-end'}}>
-            <Typography sx={{fontFamily: "system-ui"}}>{Number(data.volume).toLocaleString()}</Typography>
-            <Typography sx={{fontFamily: "system-ui"}}>{Number(data.average_volume).toLocaleString()}</Typography>
-            <Typography sx={{fontFamily: "system-ui"}}>{data.relative_volatility}</Typography>
+            <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryBlue, fontWeight: "500"}}>{Number(data.volume).toLocaleString()}</Typography>
+            <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryGreen, fontWeight: "500"}}>{Number(data.average_volume).toLocaleString()}</Typography>
+            <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryPurple, fontWeight: "500"}}>{data.relative_volatility}</Typography>
           </Stack>
         </Stack>
       </Stack>
@@ -42,15 +42,15 @@ const VolumeChart = ({stockData}) => {
           <svg width={20} height={14}>
             <rect width={14} height={14} fill={colors.secondaryBlue} />
           </svg>
-          <Typography sx={{fontFamily: "system-ui"}}>
+          <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryBlue}}>
             Today's Volume
           </Typography>
         </Stack>
         <Stack direction="row" sx={{alignItems: 'center'}}>
           <svg width={20} height={14}>
-            <rect width={14} height={14} fill="#82ca9d" />
+            <rect width={14} height={14} fill={colors.secondaryGreen} />
           </svg>
-          <Typography sx={{fontFamily: "system-ui"}}>
+          <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryGreen}}>
             Average Volume
           </Typography>
         </Stack>
@@ -61,11 +61,11 @@ const VolumeChart = ({stockData}) => {
               y1={7}
               x2={20}
               y2={7}
-              stroke='#ff7300'
+              stroke={colors.secondaryPurple}
               strokeWidth={2}
             />
           </svg>
-          <Typography sx={{fontFamily: "system-ui"}}>
+          <Typography sx={{fontFamily: "system-ui"}} style={{color: colors.secondaryPurple}}>
             Relative Volatility
           </Typography>
         </Stack>
@@ -122,12 +122,12 @@ const VolumeChart = ({stockData}) => {
             <Legend content={<CustomLegend />}
             />
             <Bar yAxisId="left" dataKey="volume" fill={colors.secondaryBlue} name="Today's Volume" />
-            <Bar yAxisId="left" dataKey="average_volume" fill="#82ca9d" name="Average Volume" />
+            <Bar yAxisId="left" dataKey="average_volume" fill={colors.secondaryGreen} name="Average Volume" />
             <Line
               yAxisId="right"
               type="monotone"
               dataKey="relative_volatility"
-              stroke="#ff7300"
+              stroke={colors.secondaryPurple}
               strokeWidth={2}
               name="Relative Volatility"
             />

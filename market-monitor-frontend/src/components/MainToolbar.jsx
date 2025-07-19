@@ -75,7 +75,7 @@ const MainToolbar = ({currentPage, username}) => {
           </Link>
         </Stack>
         <Stack direction="row" spacing={2} alignItems="center">
-          <Typography fontFamily="system-ui" fontWeight={400}>
+          <Typography fontFamily="system-ui" fontWeight={400} sx={{ minWidth: 160 }}>
             {username ? `Welcome, ${username}!` : "Welcome!"}
           </Typography>
           <Button className="logout-button" color="white" variant="outlined" onClick={handleLogout}>

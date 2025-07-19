@@ -8,6 +8,7 @@ import {
   Stack,
   Grid,
 } from '@mui/material';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import StockTile from '../components/StockTile.jsx';
 import MainToolbar from "../components/MainToolbar.jsx";
 import SevenDayTimeSeries from "../components/SevenDayTimeSeries.jsx";
@@ -21,6 +22,7 @@ const Dashboard = () => {
   const [cronStockChartRangeData, setCronStockChartRangeData] = useState([]);
   const [cronStockData, setCronStockData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [failedToLoad, setFailedToLoad] = useState(false);
   const [error, setError] = useState("");
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [username, setUsername] = useState("");
@@ -79,8 +81,15 @@ const Dashboard = () => {
         setIsLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
+        if (err.message === "Failed to fetch" || err.message.includes("NetworkError")) {
+          setError("Unable to connect to the server. Please check your internet or try again later.");
+        }
+        else {
+          setError(err.message);
+        }
+        setFailedToLoad(true);
         setIsLoading(false);
+        setIsErrorModalOpen(true);
       });
   }, []);
 
@@ -113,7 +122,13 @@ const Dashboard = () => {
         {isLoading && (
           <CircularProgress size={100} />
         )}
-        {!isLoading && (<Stack direction="row" gap={4}>
+        {failedToLoad && (
+          <Stack sx={{alignItems: 'center'}}>
+            <ErrorOutlineIcon sx={{ color: 'error.main', fontSize: 100 }} />
+            <Typography sx={{fontFamily: "system-ui", fontSize: '40px', color: 'error.main'}}>No data found</Typography>
+          </Stack>
+        )}
+        {!isLoading && !failedToLoad && (<Stack direction="row" gap={4}>
           <Stack gap={4} width={800}>
             <Stack direction="row" gap={2}>
               {cronStockData.map((stock) => (

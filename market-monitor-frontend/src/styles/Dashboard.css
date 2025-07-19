@@ -53,7 +53,7 @@
 
 .MuiTableBody-root .MuiTableRow-root:hover {
   background-color: #e3f2fd;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 
 .stock-performance-header {

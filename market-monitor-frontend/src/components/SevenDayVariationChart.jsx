@@ -8,6 +8,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Legend, Area,
 } from "recharts";
 import { colors } from "../styles/colors";
+import CustomSevenDayChartTooltip from "./CustomSevenDayChartTooltip";
 
 const SevenDayVariationChart = ({data}) => {
   return (
@@ -20,38 +21,48 @@ const SevenDayVariationChart = ({data}) => {
     >
       <Stack>
         <Typography variant="h6" fontFamily="system-ui" mb={1} fontWeight="400">
-          Price Range Over the Last 7 Days
+          Recent Stock Price Intra-Day Variation
         </Typography>
         <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+          <AreaChart data={data} margin={{ top: 10, right: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="retrievalTime" />
-            <YAxis />
-            <Tooltip />
+            <YAxis label={{ value: "Price Range", dx: 10, dy: 40, angle: -90, position: "insideLeft",
+              style: { fontWeight: "bold", fontSize: 16 }
+              }}
+              tickFormatter={(value, index) =>
+                index === 0 ? '' : new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                  minimumFractionDigits: 0,
+                }).format(value)
+              }
+            />
+            <Tooltip content={CustomSevenDayChartTooltip} />
             <Legend />
+            <Area
+              type="monotone"
+              dataKey="Alphabet, Inc. (GOOG)"
+              stackId="1"
+              stroke={colors.secondaryGreen}
+              fill={colors.secondaryGreen}
+              name="Google (GOOG)"
+            />
             <Area
               type="monotone"
               dataKey="Apple, Inc. (AAPL)"
               stackId="1"
-              stroke="#8884d8"
-              fill="#8884d8"
+              stroke={colors.secondaryPurple}
+              fill={colors.secondaryPurple}
               name="Apple (AAPL)"
             />
             <Area
               type="monotone"
               dataKey="Amazon.com, Inc. (AMZN)"
               stackId="1"
-              stroke="#ffc658"
-              fill="#ffc658"
+              stroke={colors.secondaryBlue}
+              fill={colors.secondaryBlue}
               name="Amazon (AMZN)"
-            />
-            <Area
-              type="monotone"
-              dataKey="Alphabet, Inc. (GOOG)"
-              stackId="1"
-              stroke="#82ca9d"
-              fill="#82ca9d"
-              name="Google (GOOG)"
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -91,7 +91,12 @@ const PickMyStocks = () => {
         navigate("/", { state: { toastMessage: 'Your stocks were updated successfully!' } });
       })
       .catch((err) => {
-        setError(err.message);
+        if (err.message === "Failed to fetch" || err.message.includes("NetworkError")) {
+          setError("Unable to connect to the server. Please check your internet or try again later.");
+        }
+        else {
+          setError(err.message);
+        }
         setIsSubmitting(false);
         setIsErrorModalOpen(true);
       });

@@ -8,6 +8,7 @@ import {
   Modal,
   Button,
 } from '@mui/material';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import MainToolbar from "../components/MainToolbar.jsx";
 import StockTile from '../components/StockTile.jsx';
 import FiftyTwoWeekRangeChart from '../components/FiftyTwoWeekRangeChart.jsx';
@@ -20,6 +21,7 @@ import '../styles/Dashboard.css';
 const Dashboard = () => {
   const [stockData, setStockData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [failedToLoad, setFailedToLoad] = useState(false);
   const [error, setError] = useState("");
   const [username, setUsername] = useState("");
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
@@ -79,6 +81,7 @@ const Dashboard = () => {
         else {
           setError(err.message);
         }
+        setFailedToLoad(true);
         setIsLoading(false);
         setIsErrorModalOpen(true);
       });
@@ -113,7 +116,13 @@ const Dashboard = () => {
         {isLoading && (
           <CircularProgress size={100} />
         )}
-        {!isLoading && (<Stack direction="row" gap={4}>
+        {failedToLoad && (
+          <Stack sx={{alignItems: 'center'}}>
+            <ErrorOutlineIcon sx={{ color: 'error.main', fontSize: 100 }} />
+            <Typography sx={{fontFamily: "system-ui", fontSize: '40px', color: 'error.main'}}>No data found</Typography>
+          </Stack>
+        )}
+        {!isLoading && !failedToLoad && (<Stack direction="row" gap={4}>
           <Stack gap={4} width={800}>
             <Stack direction="row" gap={2}>
               {stockData.map((stock) => (
