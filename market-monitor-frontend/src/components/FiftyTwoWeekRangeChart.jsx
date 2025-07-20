@@ -3,6 +3,8 @@ import {
   Typography,
   Stack,
   Paper,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart,
@@ -11,6 +13,9 @@ import {
 import { colors } from "../styles/colors";
 
 const FiftyTwoWeekRangeChart = ({stockData}) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+
   const Custom52WeekChartTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
     const data = payload[0].payload;
@@ -39,14 +44,15 @@ const FiftyTwoWeekRangeChart = ({stockData}) => {
       elevation={3}
       sx={{
         borderRadius: 2,
-        p: 1.5
+        p: 1.5,
       }}
+      width="100%"
     >
       <Stack>
         <Typography variant="h6" mb={1} fontFamily="system-ui" fontWeight="400">
           52-Week Price Variation
         </Typography>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width={"100%"} height={300}>
           <ComposedChart data={stockData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="symbol" tick={{style: { fontWeight: "500" }}}/>
@@ -62,14 +68,14 @@ const FiftyTwoWeekRangeChart = ({stockData}) => {
                 }).format(value)
               }
             />
-            <Tooltip 
+            {!isSmallScreen && (<Tooltip 
               content={<Custom52WeekChartTooltip />}
               cursor={{
                 stroke: "#e2e8f0",
                 strokeWidth: 235,
               }}
-            />
-            <Bar dataKey="close" barSize={70} fill={colors.secondaryBlue}>
+            />)}
+            <Bar dataKey="close" barSize={isSmallScreen ? 40 : 70} fill={colors.secondaryBlue}>
               <ErrorBar
                 dataKey="fifty_two_week_range"
                 width={8}

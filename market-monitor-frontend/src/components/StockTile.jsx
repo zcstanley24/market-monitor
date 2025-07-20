@@ -34,7 +34,7 @@ const StockTile = (stock) => {
           boxShadow: 6,
         },
       }}
-      style={{width: isSmallerScreen ? "48%" : "32%"}}
+      style={{width: isSmallerScreen ? "48%" : "31.9%"}}
     >
       <Stack mb={1}>
         <Typography variant="h5" fontWeight="bold" color="#2196f3" fontFamily="system-ui">

@@ -3,6 +3,8 @@ import {
   Paper,
   Typography,
   Stack,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -11,6 +13,8 @@ import {
 import { colors } from "../styles/colors";
 
 const VolumeChart = ({stockData}) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const CustomVolumeChartTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
@@ -78,14 +82,15 @@ const VolumeChart = ({stockData}) => {
       elevation={3}
       sx={{
         borderRadius: 2,
-        p: 1.5
+        p: 1.5,
       }}
+      width="100%"
     >
       <Stack>
         <Typography variant="h6" mb={1} fontFamily="system-ui" fontWeight="400">
           Trading Volume and Volatility
         </Typography>
-        <ResponsiveContainer width={750} height={300}>
+        <ResponsiveContainer width="100%" height={300}>
           <BarChart data={stockData} 
             margin={{ top: 10, right: 20, left: 20, bottom: 0 }}
           >
@@ -113,8 +118,12 @@ const VolumeChart = ({stockData}) => {
               content={<CustomVolumeChartTooltip />}
               cursor={{ fill: "#e2e8f0" }}
             />
-            <Legend content={<CustomLegend />}
-            />
+            {!isSmallScreen && (<Legend content={<CustomLegend />}
+            />)}
+            {isSmallScreen && (<Legend wrapperStyle={{
+              whiteSpace: 'nowrap',
+              overflow: 'visible',
+            }}/>)}
             <Bar yAxisId="left" dataKey="volume" fill={colors.secondaryBlue} name="Today's Volume" />
             <Bar yAxisId="left" dataKey="average_volume" fill={colors.secondaryGreen} name="Average Volume" />
             <Line
