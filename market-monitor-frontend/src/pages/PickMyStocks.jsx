@@ -26,7 +26,7 @@ const PickMyStocks = () => {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   
   useEffect(() => {
     fetch("http://localhost:8080/stock-data", {
@@ -161,16 +161,19 @@ const PickMyStocks = () => {
         </Box>
       )}
       {!isLoading && (<Stack className="dashboard-content" spacing={3} mt={6} mb={6} width="70%" sx={{display: 'flex', alignItems: 'center'}}>
-        <Stack direction="row" align="center" mb={2} spacing={4} justifyContent="space-between">
-          <Button style={{padding: isSmallScreen ? "0" : "20px"}} onClick={() => setSelectedSymbols([])} sx={{borderColor: "#2196f3"}} variant="outlined">
+        <Typography display={isSmallScreen ? '' : 'none'} fontFamily="system-ui" fontSize="20px" color="black">
+          Please select 3 stocks to display on your dashboard
+        </Typography>
+        <Stack direction="row" alignItems="center" mb={2} spacing={4} justifyContent="space-between" sx={{flexGrow: 1, width: '100%'}}>
+          <Button style={{padding: "8px", flexShrink: 0, alignSelf: 'center'}} onClick={() => setSelectedSymbols([])} sx={{borderColor: "#2196f3"}} variant="outlined">
             <Typography color="#2196f3">
               Clear All
             </Typography>
           </Button>
-          <Typography fontFamily="system-ui" fontSize="20px" color="black">
+          <Typography display={isSmallScreen ? 'none' : ''} fontFamily="system-ui" fontSize="20px" color="black">
             Please select 3 stocks to display on your dashboard
           </Typography>
-          <Button onClick={() => handleEditSelectedStocks()} sx={{borderColor: "#2196f3"}} variant="outlined">
+          <Button style={{padding: "8px", flexShrink: 0, alignSelf: 'center'}} onClick={() => handleEditSelectedStocks()} sx={{borderColor: "#2196f3"}} variant="outlined">
             <Typography color="#2196f3">
               {isSubmitting ? <CircularProgress size="20px"/> : "Submit" }
             </Typography>
@@ -180,7 +183,7 @@ const PickMyStocks = () => {
           <Grid container spacing={4}>
             {options.map((stock) => (
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }} key={stock.symbol}>
-                <StockSelectionTile key={stock.symbol} 
+                <StockSelectionTile key={stock.symbol}
                   stock={stock} selectedSymbols={selectedSymbols} 
                   handleStockSelection={handleStockSelection}
                 />
