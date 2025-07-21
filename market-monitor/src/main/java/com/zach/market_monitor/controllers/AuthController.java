@@ -45,10 +45,10 @@ public class AuthController {
 
             ResponseCookie cookie = ResponseCookie.from("marketMonitorToken", jwt)
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(true)
                     .path("/")
-                    .maxAge(24 * 60 * 60) // 1 day
-                    .sameSite("Lax")
+                    .maxAge(24 * 60 * 60)
+                    .sameSite("Strict")
                     .build();
 
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -64,10 +64,10 @@ public class AuthController {
         try {
             ResponseCookie cookie = ResponseCookie.from("marketMonitorToken", "")
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(true)
                     .path("/")
                     .maxAge(0)
-                    .sameSite("Lax")
+                    .sameSite("Strict")
                     .build();
 
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

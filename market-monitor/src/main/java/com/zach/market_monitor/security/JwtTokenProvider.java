@@ -32,8 +32,9 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(JWT_SECRET.getBytes())
+        return Jwts.parserBuilder().setSigningKey(
+                Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8)))
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -41,12 +42,14 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         try {
-            Claims claims = Jwts.parser().setSigningKey(JWT_SECRET.getBytes()).parseClaimsJws(token).getBody();
+            Claims claims = Jwts.parserBuilder().setSigningKey(
+                    Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8)))
+                    .build().parseClaimsJws(token).getBody();
             String username = claims.getSubject();
             Date expiration = claims.getExpiration();
 
             return (username.equals(userDetails.getUsername()) && !expiration.before(new Date()));
-        } catch (SignatureException ex) {
+        } catch (SecurityException ex) {
             System.out.println("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
             System.out.println("Invalid JWT token");

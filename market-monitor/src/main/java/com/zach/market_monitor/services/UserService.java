@@ -50,10 +50,4 @@ public class UserService {
         Set<String> candidateStocksSet = Arrays.stream(candidateStocks.split(",")).collect(Collectors.toSet());
         return allowedStocks.containsAll(candidateStocksSet);
     }
-
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
-
-    public long countUsers() { return userRepository.count(); }
 }

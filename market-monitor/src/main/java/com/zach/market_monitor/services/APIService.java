@@ -10,11 +10,10 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Service
-public class APIService {
+public class ApiService {
     @Value("${twelve.apikey}")
     private String twelveApiKey;
     private WebClient webClient;

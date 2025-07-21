@@ -10,11 +10,11 @@ public class LoggingConfig {
     @Bean
     public CommonsRequestLoggingFilter requestLoggingFilter() {
         CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
-        filter.setIncludeClientInfo(true);  // Log client IP
-        filter.setIncludeQueryString(true);  // Log query parameters
-        filter.setIncludeHeaders(true);  // Log request headers
-        filter.setIncludePayload(true);  // Log request body (be cautious with sensitive data)
-        filter.setAfterMessagePrefix("REQUEST DATA: ");  // Prefix for logged request data
+        filter.setIncludeClientInfo(true);
+        filter.setIncludeQueryString(true);
+        filter.setIncludeHeaders(true);
+        filter.setIncludePayload(true);
+        filter.setAfterMessagePrefix("REQUEST DATA: ");
         return filter;
     }
 }
