@@ -8,6 +8,8 @@ import {
   CircularProgress,
   Stack,
   Grid,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import MainToolbar from "../components/MainToolbar.jsx";
 import StockSelectionTile from '../components/StockSelectionTile.jsx';
@@ -23,6 +25,8 @@ const PickMyStocks = () => {
   const [selectedSymbols, setSelectedSymbols] = useState([]);
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   
   useEffect(() => {
     fetch("http://localhost:8080/stock-data", {
@@ -158,7 +162,7 @@ const PickMyStocks = () => {
       )}
       {!isLoading && (<Stack className="dashboard-content" spacing={3} mt={6} mb={6} width="70%" sx={{display: 'flex', alignItems: 'center'}}>
         <Stack direction="row" align="center" mb={2} spacing={4} justifyContent="space-between">
-          <Button onClick={() => setSelectedSymbols([])} sx={{borderColor: "#2196f3"}} variant="outlined">
+          <Button style={{padding: isSmallScreen ? "0" : "20px"}} onClick={() => setSelectedSymbols([])} sx={{borderColor: "#2196f3"}} variant="outlined">
             <Typography color="#2196f3">
               Clear All
             </Typography>

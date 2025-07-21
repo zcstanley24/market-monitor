@@ -31,7 +31,6 @@ const Dashboard = () => {
   const location = useLocation();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down('xl'));
 
   useEffect(() => {
     if (location.state?.toastMessage) {
@@ -127,7 +126,7 @@ const Dashboard = () => {
             <Typography sx={{fontFamily: "system-ui", fontSize: '40px', color: 'error.main'}}>No data found</Typography>
           </Stack>
         )}
-        {!isLoading && !failedToLoad && (<Stack direction={isSmallScreen ? "column" : "row"} gap={4} flexWrap="wrap" sx={{justifyContent: 'center', paddingTop: '5rem', paddingBottom: '5rem'}}>
+        {!isLoading && !failedToLoad && (<Stack direction={isSmallScreen ? "column" : "row"} gap={4} flexWrap="wrap" sx={{justifyContent: 'center', margin: '5rem 0rem 5rem 1rem'}}>
           <Stack gap={4} width={isSmallScreen ? "95%" : 750}>
             <Stack direction="row" flexWrap="wrap" gap={2}>
               {stockData.map((stock) => (

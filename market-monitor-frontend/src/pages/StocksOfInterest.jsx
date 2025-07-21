@@ -7,6 +7,8 @@ import {
   CircularProgress,
   Stack,
   Grid,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import StockTile from '../components/StockTile.jsx';
@@ -26,6 +28,8 @@ const Dashboard = () => {
   const [error, setError] = useState("");
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [username, setUsername] = useState("");
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
 
   useEffect(() => {
     fetch("http://localhost:8080/cron-stock-data", {
@@ -118,7 +122,7 @@ const Dashboard = () => {
           </Box>
         </Box>
       </Modal>
-      <Grid container className="dashboard-content">
+      <Box className="dashboard-content">
         {isLoading && (
           <CircularProgress size={100} />
         )}
@@ -128,21 +132,21 @@ const Dashboard = () => {
             <Typography sx={{fontFamily: "system-ui", fontSize: '40px', color: 'error.main'}}>No data found</Typography>
           </Stack>
         )}
-        {!isLoading && !failedToLoad && (<Stack direction="row" gap={4}>
-          <Stack gap={4} width={800}>
-            <Stack direction="row" gap={2}>
+        {!isLoading && !failedToLoad && (<Stack direction={isSmallScreen ? "column" : "row"} gap={4} flexWrap="wrap" sx={{justifyContent: 'center', margin: '5rem 0rem 5rem 1rem'}}>
+          <Stack gap={4} width={isSmallScreen ? "95%" : 750}>
+            <Stack direction="row" flexWrap="wrap" gap={2}>
               {cronStockData.map((stock) => (
                 <StockTile key={stock.symbol} stockData={stock} />
               ))}
             </Stack>
             <SevenDayTimeSeries data={cronStockChartTimeSeriesData}/>
           </Stack>
-          <Stack gap={4} width={800}>
+          <Stack gap={4} width={isSmallScreen ? "95%" : 750}>
             <StockPerformanceTable stockData={cronStockData} />
             <SevenDayVariationChart data={cronStockChartRangeData} />
           </Stack>
         </Stack>)}
-      </Grid>
+      </Box>
     </Stack>);
 }
 

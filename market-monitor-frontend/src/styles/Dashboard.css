@@ -1,14 +1,13 @@
 .dashboard {
   background-color: #F1FFFF;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
 }
 
 .pick-my-stocks {
   background-color: #F1FFFF;
   min-height: 100vh;
-  min-width: 99vw;
-  overflow-x: hidden !important;
+  width: 100%;
 }
 
 .company-logo {

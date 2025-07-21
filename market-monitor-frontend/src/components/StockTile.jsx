@@ -10,6 +10,7 @@ import {
 const StockTile = (stock) => {
   const theme = useTheme();
   const isSmallerScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isSmallestScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const {
     symbol,
     name,
@@ -34,7 +35,7 @@ const StockTile = (stock) => {
           boxShadow: 6,
         },
       }}
-      style={{width: isSmallerScreen ? "48%" : "31.9%"}}
+      style={{width: isSmallestScreen ? "100%" : isSmallerScreen ? "42.445%" : "27.645%"}}
     >
       <Stack mb={1}>
         <Typography variant="h5" fontWeight="bold" color="#2196f3" fontFamily="system-ui">
