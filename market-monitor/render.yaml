@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: market-monitor
+    env: java
+    plan: free
+    buildCommand: mvn package -DskipTests
+    startCommand: java -jar target/market-monitor-1.0.0-SNAPSHOT.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 24
