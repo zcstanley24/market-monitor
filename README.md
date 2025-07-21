@@ -15,6 +15,16 @@ Market Monitor is a web application built with Spring Boot and React that provid
   - React
   - Material UI (MUI)
 
+## Features
+
+- JWT token-based user authentication for stateless security
+- Role-Based Access Control (RBAC) for fine-grained authorization
+- Spring Data JPA with PostgreSQL for persistent user and stock data storage
+- Caffeine-based caching mechanism for improved performance
+- Scheduled Spring tasks (cron jobs) for recurring data collection
+- Responsive frontend built with MUI, optimized for desktop, tablet, and mobile
+- RESTful API integration between frontend and backend
+
 ## License
 
 This project is licensed under the MIT License – see the [LICENSE](./LICENSE) file for details.
