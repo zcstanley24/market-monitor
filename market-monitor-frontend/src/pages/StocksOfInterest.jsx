@@ -18,6 +18,7 @@ import SevenDayVariationChart from "../components/SevenDayVariationChart.jsx";
 import StockPerformanceTable from "../components/StockPerformanceTable.jsx";
 import '../styles/App.css';
 import '../styles/Dashboard.css';
+import { colors } from '../styles/colors.js';
 
 const Dashboard = () => {
   const [cronStockChartTimeSeriesData, setCronStockChartTimeSeriesData] = useState([]);
@@ -114,8 +115,8 @@ const Dashboard = () => {
             </Typography>
           </Box>
           <Box mt="1.5rem">
-            <Button className="error-modal-button" onClick={() => setIsErrorModalOpen(false)} sx={{borderColor: "#2E7D32"}} variant="outlined">
-              <Typography color="#2E7D32">
+            <Button className="error-modal-button" onClick={() => setIsErrorModalOpen(false)} style={{borderColor: colors.secondaryBlue}} variant="outlined">
+              <Typography color={colors.secondaryBlue}>
                 Close
               </Typography>
             </Button>

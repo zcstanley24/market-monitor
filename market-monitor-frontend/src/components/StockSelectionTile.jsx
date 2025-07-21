@@ -4,6 +4,7 @@ import {
   Paper,
   Stack
 } from "@mui/material";
+import { colors } from '../styles/colors.js';
 
 const StockTile = ({stock, selectedSymbols, handleStockSelection}) => {
   const {
@@ -39,7 +40,7 @@ const StockTile = ({stock, selectedSymbols, handleStockSelection}) => {
     >
       <Stack mb={1} sx={{alignItems: 'center'}}>
         <img src={logo} style={{ height: '30px' }} />
-        <Typography variant="h5" fontWeight="bold" color="#2196f3" fontFamily="system-ui">
+        <Typography variant="h5" fontWeight="bold" color={colors.secondaryBlue} fontFamily="system-ui">
           {symbol}
         </Typography>
         <Typography variant="body2" fontWeight="500" color="black" fontSize="1rem" fontFamily="system-ui">

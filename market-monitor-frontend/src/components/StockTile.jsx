@@ -6,6 +6,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { colors } from '../styles/colors.js';
 
 const StockTile = (stock) => {
   const theme = useTheme();
@@ -38,7 +39,7 @@ const StockTile = (stock) => {
       style={{width: isSmallestScreen ? "100%" : isSmallerScreen ? "42.445%" : "27.645%"}}
     >
       <Stack mb={1}>
-        <Typography variant="h5" fontWeight="bold" color="#2196f3" fontFamily="system-ui">
+        <Typography variant="h5" fontWeight="bold" color={colors.secondaryBlue} fontFamily="system-ui">
           {symbol}
         </Typography>
         <Typography variant="body2" color="black" fontSize="1rem" fontFamily="system-ui">

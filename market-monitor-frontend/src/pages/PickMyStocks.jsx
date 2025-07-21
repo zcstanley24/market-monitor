@@ -14,6 +14,7 @@ import {
 import MainToolbar from "../components/MainToolbar.jsx";
 import StockSelectionTile from '../components/StockSelectionTile.jsx';
 import options from '../data/stockData.js';
+import { colors } from '../styles/colors.js';
 import '../styles/App.css';
 import '../styles/Dashboard.css';
 
@@ -121,7 +122,7 @@ const PickMyStocks = () => {
     }
     else {
       if(selectedSymbols.length > 2) {
-        setError("Please select only 3 stocks.");
+        setError("Please select only 3 stocks. You can click to deselect any of your current choices.");
         setIsErrorModalOpen(true);
       }
       else {
@@ -147,8 +148,8 @@ const PickMyStocks = () => {
             </Typography>
           </Box>
           <Box mt="1.5rem">
-            <Button className="error-modal-button" onClick={() => handleErrorModalClose()} sx={{borderColor: "#2E7D32"}} variant="outlined">
-              <Typography color="#2E7D32">
+            <Button className="error-modal-button" onClick={() => handleErrorModalClose()} style={{borderColor: colors.secondaryBlue}} variant="outlined">
+              <Typography color={colors.secondaryBlue}>
                 Close
               </Typography>
             </Button>
@@ -161,22 +162,52 @@ const PickMyStocks = () => {
         </Box>
       )}
       {!isLoading && (<Stack className="dashboard-content" spacing={3} mt={6} mb={6} width="70%" sx={{display: 'flex', alignItems: 'center'}}>
-        <Typography display={isSmallScreen ? '' : 'none'} fontFamily="system-ui" fontSize="20px" color="black">
+        <Typography display={isSmallScreen ? '' : 'none'} fontFamily="system-ui" fontSize="20px" color="black" fontWeight="500">
           Please select 3 stocks to display on your dashboard
         </Typography>
         <Stack direction="row" alignItems="center" mb={2} spacing={4} justifyContent="space-between" sx={{flexGrow: 1, width: '100%'}}>
-          <Button style={{padding: "8px", flexShrink: 0, alignSelf: 'center'}} onClick={() => setSelectedSymbols([])} sx={{borderColor: "#2196f3"}} variant="outlined">
-            <Typography color="#2196f3">
-              Clear All
-            </Typography>
+          <Button onClick={() => setSelectedSymbols([])} variant="contained" sx={{
+            px: 2,
+            py: 1,
+            backgroundColor: colors.secondaryBlue,
+            color: "white",
+            fontWeight: 500,
+            fontSize: '18px',
+            fontFamily: 'system-ui',
+            textTransform: "none",
+            boxShadow: 2,
+            '&:hover': {
+              backgroundColor: '#1E8882',
+              boxShadow: 4,
+            },
+            borderRadius: 2,
+            flexShrink: 0,
+            alignSelf: 'center'
+          }}>
+            Clear All
           </Button>
-          <Typography display={isSmallScreen ? 'none' : ''} fontFamily="system-ui" fontSize="20px" color="black">
+          <Typography display={isSmallScreen ? 'none' : ''} fontFamily="system-ui" fontSize="20px" color="black" fontWeight="500">
             Please select 3 stocks to display on your dashboard
           </Typography>
-          <Button style={{padding: "8px", flexShrink: 0, alignSelf: 'center'}} onClick={() => handleEditSelectedStocks()} sx={{borderColor: "#2196f3"}} variant="outlined">
-            <Typography color="#2196f3">
+          <Button onClick={() => handleEditSelectedStocks()} variant="contained" sx={{
+            px: 2,
+            py: 1,
+            backgroundColor: colors.secondaryBlue,
+            color: "white",
+            fontWeight: 500,
+            fontSize: '18px',
+            fontFamily: 'system-ui',
+            textTransform: "none",
+            boxShadow: 2,
+            '&:hover': {
+              backgroundColor: '#1E8882',
+              boxShadow: 4,
+            },
+            borderRadius: 2,
+            flexShrink: 0,
+            alignSelf: 'center'
+          }}>
               {isSubmitting ? <CircularProgress size="20px"/> : "Submit" }
-            </Typography>
           </Button>
         </Stack>
         <Stack direction="row">
