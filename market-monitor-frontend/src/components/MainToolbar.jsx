@@ -29,13 +29,14 @@ const MainToolbar = ({currentPage, username}) => {
   const theme = useTheme();
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
   
   const toggleDrawer = (open) => () => {
     setIsDrawerOpen(open);
   };
 
   const handleLogout = () => {
-    fetch("http://localhost:8080/auth/logout", {
+    fetch(`${backendUrl}/auth/logout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

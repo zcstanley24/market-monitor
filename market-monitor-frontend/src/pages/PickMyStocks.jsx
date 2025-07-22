@@ -28,9 +28,10 @@ const PickMyStocks = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
   
   useEffect(() => {
-    fetch("http://localhost:8080/stock-data", {
+    fetch(`${backendUrl}/stock-data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -78,7 +79,7 @@ const PickMyStocks = () => {
     };
     setIsSubmitting(true);
 
-    fetch("http://localhost:8080/followed-stocks", {
+    fetch(`${backendUrl}/followed-stocks`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"

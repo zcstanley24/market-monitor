@@ -32,6 +32,7 @@ const Dashboard = () => {
   const location = useLocation();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
   useEffect(() => {
     if (location.state?.toastMessage) {
@@ -41,7 +42,7 @@ const Dashboard = () => {
   }, [location.state]);
   
   useEffect(() => {
-    fetch("http://localhost:8080/stock-data", {
+    fetch(`${backendUrl}/stock-data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"

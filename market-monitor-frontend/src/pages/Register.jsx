@@ -27,6 +27,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [selectedSymbols, setSelectedSymbols] = useState([]);
+  const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,7 +60,7 @@ const Register = () => {
         Please check your internet or try again later.";
 
     try {
-      const response = await fetch("http://localhost:8080/auth/register", {
+      const response = await fetch(`${backendUrl}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

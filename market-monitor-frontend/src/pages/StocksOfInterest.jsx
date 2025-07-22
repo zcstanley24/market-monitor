@@ -31,9 +31,10 @@ const Dashboard = () => {
   const [username, setUsername] = useState("");
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
   useEffect(() => {
-    fetch("http://localhost:8080/cron-stock-data", {
+    fetch(`${backendUrl}/cron-stock-data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"

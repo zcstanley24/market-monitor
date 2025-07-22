@@ -21,6 +21,7 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
   useEffect(() => {
     if (location.state?.toastMessage) {
@@ -42,7 +43,7 @@ const Login = () => {
         Please check your internet or try again later.";
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch(`${backendUrl}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
