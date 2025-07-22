@@ -3,6 +3,7 @@ services:
     name: market-monitor
     env: java
     plan: free
+    root: market-monitor
     buildCommand: mvn package -DskipTests
     startCommand: java -jar target/market-monitor-1.0.0-SNAPSHOT.jar
     envVars:
