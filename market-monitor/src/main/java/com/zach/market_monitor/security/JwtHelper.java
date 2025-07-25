@@ -16,22 +16,22 @@ public class JwtHelper {
         this.userService = userService;
     }
 
-    public Optional<UserEntity> getUserFromJwtCookie(String cookieValue) throws Exception {
-        if (cookieValue == null) {
-            throw new Exception("Missing cookie");
+    public Optional<UserEntity> getUserFromJwt(String token) throws Exception {
+        if (token == null) {
+            throw new Exception("Missing JWT");
         }
 
         String username;
         Optional<UserEntity> userEntity;
         try {
-            username = jwtTokenProvider.getUsernameFromToken(cookieValue);
+            username = jwtTokenProvider.getUsernameFromToken(token);
             userEntity = userService.getUserByUsername(username);
         } catch (Exception e) {
-            throw new Exception("Unable to verify user identity through cookie");
+            throw new Exception("Unable to verify user identity through JWT");
         }
 
         if(userEntity.isEmpty()) {
-            throw new Exception("Unable to verify user identity through cookie");
+            throw new Exception("Unable to verify user identity through JWT");
         }
 
         return userEntity;

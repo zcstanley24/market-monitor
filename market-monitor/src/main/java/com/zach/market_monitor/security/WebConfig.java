@@ -19,7 +19,7 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(domains)
                         .allowedMethods("GET", "POST", "PUT")
-                        .allowedHeaders("*")
+                        .allowedHeaders("Authorization", "Content-Type")
                         .allowCredentials(true);
             }
         };

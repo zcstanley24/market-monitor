@@ -3,7 +3,6 @@ package com.zach.market_monitor.security;
 import com.zach.market_monitor.services.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,21 +36,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        String header = request.getHeader("Authorization");
         String token = null;
         String username = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("marketMonitorToken".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
-                }
+
+        if (header != null && header.startsWith("Bearer ")) {
+            token = header.substring(7);
+            try {
+                username = jwtTokenProvider.getUsernameFromToken(token);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid token");
+                return;
             }
         }
-        try {
-            username = jwtTokenProvider.getUsernameFromToken(token);
-        } catch (Exception e) {
-            logger.error("JWT token extraction failed", e);
+        else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Missing Authorization header");
+            return;
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -64,6 +66,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+            else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or expired token");
+                return;
+            }
+        }
+        else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid or expired token");
+            return;
         }
 
         filterChain.doFilter(request, response);

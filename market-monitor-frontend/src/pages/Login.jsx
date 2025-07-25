@@ -43,23 +43,24 @@ const Login = () => {
         Please check your internet or try again later.";
 
     try {
-      const response = await fetch(`${backendUrl}/auth/login`, {
+      const response = fetch(`${backendUrl}/auth/login`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
-        credentials: "include"
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        setError(errorText || defaultErrorText);
-      }
-      else {
-        navigate('/');
-      }
-
+      })
+      .then(async (res) => {
+        if (!res.ok) {
+          const errorText = await res.text();
+          setError(errorText || defaultErrorText);
+          return;
+        }
+        const data = await res.json();
+        localStorage.setItem("marketMonitorToken", data.token);
+        navigate("/");
+        return;
+      })
     } catch (err) {
       setError(defaultErrorText);
     }

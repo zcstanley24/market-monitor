@@ -70,7 +70,6 @@ const Register = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ username, password, followedStocks }),
-        credentials: "include"
       });
 
       if (!response.ok) {

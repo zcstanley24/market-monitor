@@ -37,17 +37,22 @@ public class StockController {
 
     @Cacheable(cacheNames = "stocks", unless = "#result.statusCodeValue != 200")
     @GetMapping("/stock-data")
-    public ResponseEntity<?> stockData(@CookieValue(value = "marketMonitorToken", required = false) String cookieValue) {
+    public ResponseEntity<?> stockData(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
         Optional<UserEntity> userEntity;
         try {
-            userEntity = jwtHelper.getUserFromJwtCookie(cookieValue);
+            userEntity = jwtHelper.getUserFromJwt(token);
         }
         catch (Exception e) {
-            if(e.getMessage() == "Missing cookie") {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing cookie");
+            if(e.getMessage() == "Missing JWT") {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing JWT");
             }
             else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through cookie");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through JWT");
             }
         }
 
@@ -63,19 +68,24 @@ public class StockController {
         return ResponseEntity.ok(response);
     }
 
-    @CacheEvict(cacheNames = "stocks", key = "#cookieValue")
+    @CacheEvict(cacheNames = "stocks", key = "#authHeader")
     @PutMapping("/followed-stocks")
-    public ResponseEntity<?> followedStocks(@CookieValue(value = "marketMonitorToken", required = false) String cookieValue, @RequestBody String symbols) {
+    public ResponseEntity<?> followedStocks(@RequestHeader(value = "Authorization", required = false) String authHeader, @RequestBody String symbols) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
         Optional<UserEntity> userEntity;
         try {
-            userEntity = jwtHelper.getUserFromJwtCookie(cookieValue);
+            userEntity = jwtHelper.getUserFromJwt(token);
         }
         catch (Exception e) {
-            if(e.getMessage() == "Missing cookie") {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing cookie");
+            if(e.getMessage() == "Missing JWT") {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing JWT");
             }
             else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through cookie");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through JWT");
             }
         }
 
@@ -92,17 +102,22 @@ public class StockController {
     }
 
     @GetMapping("/cron-stock-data")
-    public ResponseEntity<?> cronStockData(@CookieValue(value = "marketMonitorToken", required = false) String cookieValue) {
+    public ResponseEntity<?> cronStockData(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
         Optional<UserEntity> userEntity;
         try {
-            userEntity = jwtHelper.getUserFromJwtCookie(cookieValue);
+            userEntity = jwtHelper.getUserFromJwt(token);
         }
         catch (Exception e) {
-            if(e.getMessage() == "Missing cookie") {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing cookie");
+            if(e.getMessage() == "Missing JWT") {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing JWT");
             }
             else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through cookie");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unable to verify user identity through JWT");
             }
         }
 

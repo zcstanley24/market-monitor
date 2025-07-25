@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   Modal,
   Typography,
@@ -29,6 +30,7 @@ const Dashboard = () => {
   const [error, setError] = useState("");
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [username, setUsername] = useState("");
+  const navigate = useNavigate();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
@@ -37,13 +39,13 @@ const Dashboard = () => {
     fetch(`${backendUrl}/cron-stock-data`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Authorization": `Bearer ${localStorage.getItem("marketMonitorToken")}`,
+        "Content-Type": "application/json",
       },
-      credentials: "include"
     })
       .then((res) => {
-        if(res.status === 403) {
-          window.location.href = '/login';
+        if([401, 403].includes(res.status)) {
+          navigate('/login');
         }
         else if(!res.ok) {
           throw new Error("Failed to fetch stock data");

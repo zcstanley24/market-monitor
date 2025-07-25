@@ -36,25 +36,8 @@ const MainToolbar = ({currentPage, username}) => {
   };
 
   const handleLogout = () => {
-    fetch(`${backendUrl}/auth/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: "include"
-    })
-      .then((res) => {
-        if(!res.ok) {
-          throw new Error('Logout failed');
-        }
-        return res;
-      })
-      .then(() => {
-        navigate('/login');
-      })
-      .catch(() => {
-        setIsErrorModalOpen(true);
-      });
+    localStorage.removeItem('marketMonitorToken');
+    navigate('/login');
   };
 
   return (

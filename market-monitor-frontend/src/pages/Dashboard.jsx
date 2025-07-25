@@ -45,12 +45,12 @@ const Dashboard = () => {
     fetch(`${backendUrl}/stock-data`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Authorization": `Bearer ${localStorage.getItem("marketMonitorToken")}`,
+        "Content-Type": "application/json",
       },
-      credentials: "include"
     })
       .then((res) => {
-        if(res.status === 403) {
+        if([401, 403].includes(res.status)) {
           navigate('/login');
         }
         else if(!res.ok) {

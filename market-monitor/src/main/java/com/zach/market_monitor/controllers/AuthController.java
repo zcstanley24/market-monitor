@@ -4,15 +4,15 @@ import com.zach.market_monitor.security.*;
 import com.zach.market_monitor.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -43,38 +43,9 @@ public class AuthController {
 
             String jwt = tokenProvider.generateToken(authentication);
 
-            ResponseCookie cookie = ResponseCookie.from("marketMonitorToken", jwt)
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(24 * 60 * 60)
-                    .sameSite("None")
-                    .build();
-
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-            return ResponseEntity.ok("Login successful");
+            return ResponseEntity.ok(Map.of("token", jwt));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-        }
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        try {
-            ResponseCookie cookie = ResponseCookie.from("marketMonitorToken", "")
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(0)
-                    .sameSite("None")
-                    .build();
-
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-            return ResponseEntity.ok("Logout successful");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Encountered an error when expiring token");
         }
     }
 

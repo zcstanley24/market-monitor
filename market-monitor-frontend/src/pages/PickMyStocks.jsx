@@ -34,12 +34,12 @@ const PickMyStocks = () => {
     fetch(`${backendUrl}/stock-data`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Authorization": `Bearer ${localStorage.getItem("marketMonitorToken")}`,
+        "Content-Type": "application/json",
       },
-      credentials: "include"
     })
       .then((res) => {
-        if(res.status === 403) {
+        if([401, 403].includes(res.status)) {
           navigate('/login');
         }
         else if(!res.ok) {
@@ -82,10 +82,10 @@ const PickMyStocks = () => {
     fetch(`${backendUrl}/followed-stocks`, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json"
+        "Authorization": `Bearer ${localStorage.getItem("marketMonitorToken")}`,
+        "Content-Type": "application/json",
       },
       body: selectedSymbols.join(","),
-      credentials: "include"
     })
       .then((res) => {
         if(res.status === 403) {
