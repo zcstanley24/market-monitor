@@ -55,7 +55,7 @@ const Register = () => {
     }
     else if(!/[a-z]/.test(password) || !/[A-Z]/.test(password) || 
     !/[0-9]/.test(password) || !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      setError("Your password does not meet the character requirements");
+      setError("Your password must have at least one lowercase, uppercase, numerical, and special character");
       return;
     }
 

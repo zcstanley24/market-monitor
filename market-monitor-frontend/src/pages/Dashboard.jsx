@@ -31,7 +31,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
   useEffect(() => {
@@ -100,7 +101,7 @@ const Dashboard = () => {
         open={isErrorModalOpen}
         onClose={() => setIsErrorModalOpen(false)}
       >
-        <Box className="error-modal" width={400}>
+        <Box className="error-modal" width={isSmallScreen ? 200 : 400}>
           <Box>
             <Typography variant="h4" fontFamily="system-ui">
               Oops!
@@ -128,8 +129,8 @@ const Dashboard = () => {
             <Typography sx={{fontFamily: "system-ui", fontSize: '40px', color: 'error.main'}}>No data found</Typography>
           </Stack>
         )}
-        {!isLoading && !failedToLoad && (<Stack direction={isSmallScreen ? "column" : "row"} gap={4} flexWrap="wrap" sx={{justifyContent: 'center', margin: '5rem 0rem 5rem 1rem'}}>
-          <Stack gap={4} width={isSmallScreen ? "95%" : 750}>
+        {!isLoading && !failedToLoad && (<Stack direction={isMediumScreen ? "column" : "row"} gap={4} flexWrap="wrap" sx={{justifyContent: 'center', margin: '5rem 0rem 5rem 1rem'}}>
+          <Stack gap={4} width={isMediumScreen ? "95%" : 750}>
             <Stack direction="row" flexWrap="wrap" gap={2}>
               {stockData.map((stock) => (
                 <StockTile key={stock.symbol} stockData={stock} />
@@ -137,7 +138,7 @@ const Dashboard = () => {
             </Stack>
             <FiftyTwoWeekRangeChart stockData={stockData} />
           </Stack>
-          <Stack gap={4} width={isSmallScreen ? "95%" : 750}>
+          <Stack gap={4} width={isMediumScreen ? "95%" : 750}>
             <StockPerformanceTable stockData={stockData} />
             <VolumeChart stockData={stockData} />
           </Stack>

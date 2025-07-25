@@ -27,7 +27,8 @@ const PickMyStocks = () => {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
   
   useEffect(() => {
@@ -139,7 +140,7 @@ const PickMyStocks = () => {
         open={isErrorModalOpen}
         onClose={() => setIsErrorModalOpen(false)}
       >
-        <Box className="error-modal" width={400}>
+        <Box className="error-modal" width={isSmallScreen ? 200 : 400}>
           <Box>
             <Typography variant="h4" fontFamily="system-ui">
               Oops!
@@ -163,7 +164,7 @@ const PickMyStocks = () => {
         </Box>
       )}
       {!isLoading && (<Stack className="dashboard-content" spacing={3} mt={6} mb={6} width="70%" sx={{display: 'flex', alignItems: 'center'}}>
-        <Typography display={isSmallScreen ? '' : 'none'} fontFamily="system-ui" fontSize="20px" color="black" fontWeight="500">
+        <Typography display={isMediumScreen ? '' : 'none'} fontFamily="system-ui" fontSize="20px" color="black" fontWeight="500">
           Please select 3 stocks to display on your dashboard
         </Typography>
         <Stack direction="row" alignItems="center" mb={2} spacing={4} justifyContent="space-between" sx={{flexGrow: 1, width: '100%'}}>
@@ -187,7 +188,7 @@ const PickMyStocks = () => {
           }}>
             Clear All
           </Button>
-          <Typography display={isSmallScreen ? 'none' : ''} fontFamily="system-ui" fontSize="20px" color="black" fontWeight="500">
+          <Typography display={isMediumScreen ? 'none' : ''} fontFamily="system-ui" fontSize="20px" color="black" fontWeight="500">
             Please select 3 stocks to display on your dashboard
           </Typography>
           <Button onClick={() => handleEditSelectedStocks()} variant="contained" sx={{

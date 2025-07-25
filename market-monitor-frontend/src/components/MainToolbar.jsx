@@ -6,7 +6,6 @@ import {
   Link,
   AppBar,
   Toolbar,
-  Modal,
   Box,
   useMediaQuery,
   useTheme,
@@ -24,12 +23,10 @@ import { colors } from "../styles/colors";
 
 const MainToolbar = ({currentPage, username}) => {
   const navigate = useNavigate();
-  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
   
   const toggleDrawer = (open) => () => {
     setIsDrawerOpen(open);
@@ -126,28 +123,6 @@ const MainToolbar = ({currentPage, username}) => {
           </List>
         </Box>
       </Drawer>)}
-      <Modal
-        open={isErrorModalOpen}
-        onClose={() => setIsErrorModalOpen(false)}
-      >
-        <Box className="error-modal" width={400}>
-          <Box>
-            <Typography variant="h4" fontFamily="system-ui">
-              Oops!
-            </Typography>
-            <Typography mt="1.5rem" fontFamily="system-ui">
-              We encountered an error when attempting to log you out. Please try again later.
-            </Typography>
-          </Box>
-          <Box mt="1.5rem">
-            <Button className="error-modal-button" onClick={() => setIsErrorModalOpen(false)} style={{borderColor: colors.primaryGreen}} variant="outlined">
-              <Typography color={colors.primaryGreen}>
-                Close
-              </Typography>
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
     </AppBar>
   );
 };
