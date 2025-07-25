@@ -14,7 +14,7 @@ const StockPerformanceTable = ({stockData}) => {
   const tableHeaders = ["Company Name", "Open", "Close", "Low", "High", "Change", "Change (%)"];
   
   return (
-    <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
+    <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2, maxWidth: '100vw' }}>
       <Table>
         <TableHead>
           <TableRow style={{ backgroundColor: colors.secondaryBlue }}>

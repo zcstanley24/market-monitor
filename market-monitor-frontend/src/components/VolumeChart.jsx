@@ -92,7 +92,9 @@ const VolumeChart = ({stockData}) => {
         </Typography>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={stockData} 
-            margin={{ top: 10, right: 20, left: 20, bottom: 0 }}
+            marginRight={isSmallScreen ? 0 : 20}
+            marginLeft={isSmallScreen ? 0 : 20}
+            margin={{ top: 10, bottom: 0 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="symbol" tick={{style: { fontWeight: "500" }}} />
@@ -103,16 +105,20 @@ const VolumeChart = ({stockData}) => {
                 if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
                 return value;
               }}
-              label={{ value: "Volume of Shares",  dx: -15, dy: 70, angle: -90, position: "insideLeft",
-                style: { fontWeight: "bold", fontSize: 16 }
-               }}
+              label={
+                !isSmallScreen ? { 
+                  value: "Volume of Shares",  dx: -15, dy: 70, angle: -90, position: "insideLeft",
+                  style: { fontWeight: "bold", fontSize: 16 }
+               } : null }
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              label={{ value: "Relative Volatility", dx: 15, dy: 70, angle: 90, position: "insideRight",
-                style: { fontWeight: "bold", fontSize: 16 }
-               }}
+              label={
+                !isSmallScreen ? { 
+                  value: "Relative Volatility", dx: 15, dy: 70, angle: 90, position: "insideRight",
+                  style: { fontWeight: "bold", fontSize: 16 }
+               } : null }
             />
             <Tooltip 
               content={<CustomVolumeChartTooltip />}
@@ -120,9 +126,11 @@ const VolumeChart = ({stockData}) => {
             />
             {!isSmallScreen && (<Legend content={<CustomLegend />}
             />)}
-            {isSmallScreen && (<Legend wrapperStyle={{
-              whiteSpace: 'nowrap',
+            {isSmallScreen && (
+              <Legend wrapperStyle={{
               overflow: 'visible',
+              fontSize: '0.85rem',
+              bottom: -7
             }}/>)}
             <Bar yAxisId="left" dataKey="volume" fill={colors.secondaryBlue} name="Today's Volume" />
             <Bar yAxisId="left" dataKey="average_volume" fill={colors.secondaryGreen} name="Average Volume" />

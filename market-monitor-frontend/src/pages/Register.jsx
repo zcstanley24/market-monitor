@@ -15,6 +15,8 @@ import {
   Checkbox,
   ListItemText,
   Tooltip,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import options from '../data/stockData.js';
@@ -27,6 +29,8 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [selectedSymbols, setSelectedSymbols] = useState([]);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
   const handleSubmit = async (e) => {
@@ -139,7 +143,7 @@ const Register = () => {
             </Typography>
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <Tooltip title="Please ensure your username is unique and contains between 8 and 30 characters."
-                placement="right" arrow 
+                placement={isSmallScreen ? "top" : "right"} arrow 
                 slotProps={{
                   tooltip: {
                     sx: {
@@ -179,7 +183,7 @@ const Register = () => {
               <Tooltip title="Please ensure your password is between 8 and 30 characters,
                 as well as contains at least one lowercase, one uppercase, one numerical, 
                 and one special character."
-                placement="right" arrow 
+                placement={isSmallScreen ? "top" : "right"} arrow 
                 slotProps={{
                   tooltip: {
                     sx: {

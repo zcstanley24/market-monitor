@@ -22,6 +22,7 @@ Market Monitor is a web application built with Spring Boot and React that provid
 - Spring Data JPA with PostgreSQL for persistent user and stock data storage
 - Caffeine-based caching mechanism for improved performance
 - Scheduled Spring tasks (cron jobs) for recurring data collection
+- Dockerized backend for better portability across environments
 - Responsive frontend built with MUI, optimized for desktop, tablet, and mobile
 - RESTful API integration between frontend and backend
 
