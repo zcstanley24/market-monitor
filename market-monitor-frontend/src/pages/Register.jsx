@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -15,6 +15,7 @@ import {
   Checkbox,
   ListItemText,
   Tooltip,
+  InputAdornment,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -22,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import options from '../data/stockData.js';
 import { colors } from "../styles/colors";
 import mmGreenLogo from '../assets/mmgreenlogo.png';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -29,9 +31,35 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [selectedSymbols, setSelectedSymbols] = useState([]);
+  const [showUsernameRequirements, setShowUsernameRequirements] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg'));
   const backendUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+  const usernameInfoRef = useRef(null);
+  const passwordInfoRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        usernameInfoRef.current &&
+        !usernameInfoRef.current.contains(event.target)
+      ) {
+        setShowUsernameRequirements(false);
+      }
+      if (
+        passwordInfoRef.current &&
+        !passwordInfoRef.current.contains(event.target)
+      ) {
+        setShowPasswordRequirements(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -142,7 +170,8 @@ const Register = () => {
             </Typography>
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <Tooltip title="Please ensure your username is unique and contains between 8 and 30 characters."
-                placement={isSmallScreen ? "top" : "right"} arrow 
+                placement={isSmallScreen ? "top" : "right"} arrow
+                open={showUsernameRequirements}
                 slotProps={{
                   tooltip: {
                     sx: {
@@ -177,12 +206,22 @@ const Register = () => {
                       fontFamily: 'system-ui',
                     },
                   }}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <InfoOutlinedIcon ref={usernameInfoRef} cursor="pointer" color="action" onClick={() => setShowUsernameRequirements(true)}/>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
                 />
               </Tooltip>
               <Tooltip title="Please ensure your password is between 8 and 30 characters,
                 as well as contains at least one lowercase, one uppercase, one numerical, 
                 and one special character."
                 placement={isSmallScreen ? "top" : "right"} arrow 
+                open={showPasswordRequirements}
                 slotProps={{
                   tooltip: {
                     sx: {
@@ -215,6 +254,15 @@ const Register = () => {
                     },
                     '& .MuiInputLabel-root': {
                       fontFamily: 'system-ui',
+                    },
+                  }}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <InfoOutlinedIcon ref={passwordInfoRef} cursor="pointer" color="action" onClick={() => setShowPasswordRequirements(true)}/>
+                        </InputAdornment>
+                      ),
                     },
                   }}
                 />
